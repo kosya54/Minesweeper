@@ -11,7 +11,7 @@ public class Cell {
 
         numbers = new String[9];
         for (int i = 0, j = 1; i < 9; i++, j++) {
-            numbers[i] = String.format("[" + j + "] ");
+            numbers[i] = "[" + j + "] ";
         }
     }
 

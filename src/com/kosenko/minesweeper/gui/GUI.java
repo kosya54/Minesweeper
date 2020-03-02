@@ -5,44 +5,16 @@ import java.awt.*;
 
 public class GUI {
     private JFrame mainWindow;
-
-    private JPanel cellsPanel;
-
     private GridBagConstraints constraints;
-
-    private final int cellSize = 50;
-    private int countCells = 9;
-    private int countMines = 10;
 
     public GUI() {
         mainWindow = new JFrame("Minesweeper");
 
-//        int width = cellSize * countCells;
-//        int height = width + 1;
-
-//        mainWindow.setSize(width, height);
-        mainWindow.setResizable(false);
+        mainWindow.setResizable(true);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.setLocationRelativeTo(null);
-        mainWindow.setLayout(new GridLayout());
         mainWindow.setJMenuBar(createMenuBar());
-
-//        JTable test = new JTable();
-//        mainWindow.add(test);
-
-//        mainWindow.pack();
-
-        constraints = setConstraints();
-
-        cellsPanel = createCellsPanel();
-
-        constraints.fill = GridBagConstraints.BOTH;
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.weightx = 0;
-        constraints.weighty = 1;
-
-        mainWindow.add(cellsPanel, constraints);
+        mainWindow.add(minefieldPanel(9, 9));
     }
 
     public void showGUI() {
@@ -52,59 +24,77 @@ public class GUI {
             } catch (Exception e) {
                 System.out.println("Error");
             }
+
             mainWindow.setVisible(true);
             mainWindow.pack();
         });
     }
 
     private JMenuBar createMenuBar() {
-        JMenu fileMenu = new JMenu("File");
+        JMenu file = new JMenu("File");
 
-        JMenuItem newGameItem = new JMenuItem("New game");
-        fileMenu.add(newGameItem);
+        JMenuItem newGame = new JMenuItem("New game");
+        file.add(newGame);
 
-        JMenuItem highScoreItem = new JMenuItem("High score");
-        fileMenu.add(highScoreItem);
+        JMenuItem highScore = new JMenuItem("High score");
+        file.add(highScore);
 
-        JMenuItem aboutItem = new JMenuItem("About");
-        fileMenu.add(aboutItem);
+        JMenuItem about = new JMenuItem("About");
+        file.add(about);
 
-        fileMenu.addSeparator();
+        file.addSeparator();
 
-        JMenuItem exitItem = new JMenuItem("Exit");
-        fileMenu.add(exitItem);
+        JMenuItem exit = new JMenuItem("Exit");
+        file.add(exit);
 
-        exitItem.addActionListener(e -> System.exit(0));
+        exit.addActionListener(e -> System.exit(0));
 
-        JMenuBar mainMenuBar = new JMenuBar();
-        mainMenuBar.add(fileMenu);
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.add(file);
 
-        return mainMenuBar;
+        return menuBar;
     }
 
-    private GridBagConstraints setConstraints() {
-        GridBagConstraints constraints = new GridBagConstraints();
+    private JPanel minefieldPanel(int row, int cols) {
+        int hgap = 0;
+        int vgap = 0;
+        GridLayout layout = new GridLayout(row, cols, hgap, vgap);
 
-//        constraints.anchor = GridBagConstraints.NORTH;
-//        constraints.fill = GridBagConstraints.NONE;
-//        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.gridheight = 1;
+        JPanel panel = new JPanel();
 
-        return constraints;
-    }
+        int iconWidth = 40;
+        int iconHeight = 40;
+        int width = iconWidth * row + hgap * (row - 1);
+        int height = iconHeight * cols + vgap * (cols - 1);;
 
-    private JPanel createCellsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
+        panel.setPreferredSize(new Dimension(width, height));
+        panel.setLayout(layout);
 
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                constraints.gridx = j;
-                constraints.gridy = i;
+        String iconName = "D:\\__Java\\IdeaProjects\\Minesweeper\\src\\com\\kosenko\\minesweeper\\resources\\tile2.png";
+        Icon tile = new ImageIcon(iconName);
+        for (int i = 0; i < row * cols; i++) {
+            JButton button = new JButton(tile);
+            button.setBorderPainted(false);
+            button.setPreferredSize(new Dimension(iconWidth, iconHeight));
 
-                panel.add(new JButton("" + j), constraints);
-            }
+            panel.add(button);
         }
+
         return panel;
     }
+
+/*    private JPanel createGridPanel() {
+        Image bomb = new ImageIcon("D:\\__Java\\IdeaProjects\\Minesweeper\\src\\com\\kosenko\\minesweeper\\resources\\bomb.png").getImage();
+
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.drawImage(bomb, 0, 0, this);
+            }
+        };
+
+        panel.setPreferredSize(new Dimension(500, 500));
+
+        return panel;
+    } */
 }

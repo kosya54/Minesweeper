@@ -1,13 +1,15 @@
 package com.kosenko.minesweeper;
 
-import com.kosenko.minesweeper.models.Cell;
-import com.kosenko.minesweeper.models.Minefield;
+//import com.kosenko.minesweeper.models.Cell;
+//import com.kosenko.minesweeper.models.Minefield;
+
+import com.kosenko.minesweeper.gui.GUI;
 
 public class Main {
     public static void main(String[] args) {
-        int width = 9;
-        int height = 9;
-        int countMines = 10;
+/*        int width = 27;
+        int height = 27;
+        int countMines = 30;
 
         Cell cell = new Cell();
         Minefield minefield = new Minefield(width, height, countMines, cell);
@@ -19,9 +21,9 @@ public class Main {
                 System.out.print(value);
             }
             System.out.println();
-        }
-/*        GUI gui = new GUI();
-        gui.showGUI(); */
+        } */
+        GUI gui = new GUI();
+        gui.showGUI();
 
 /*        Mines mines = new Mines(9, 9, 10);
 
