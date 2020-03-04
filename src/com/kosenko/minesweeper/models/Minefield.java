@@ -9,13 +9,6 @@ public class Minefield {
 
     private Cell cell;
 
-/*    public Minefield() {
-        width = 9;
-        height = 9;
-        countMines = 10;
-        cell = new Cell();
-    } */
-
     public Minefield(int width, int height, int countMines, Cell cell) {
         this.width = width;
         this.height = height;

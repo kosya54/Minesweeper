@@ -1,20 +1,44 @@
 package com.kosenko.minesweeper.gui;
 
+import com.kosenko.minesweeper.controllers.MinefieldController;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class GUI {
     private JFrame mainWindow;
-    private GridBagConstraints constraints;
+    private JPanel container;
+    private  CardLayout cardLayout;
+
+    private MinefieldController minefieldController;
+
+    private final static int ICON_WIDTH = 40;
+    private final static int ICON_HEIGHT = 40;
+    private final static int ICON_V_GAP = 0;
+    private final static int ICON_H_GAP = 0;
 
     public GUI() {
-        mainWindow = new JFrame("Minesweeper");
+        cardLayout = new CardLayout();
 
-        mainWindow.setResizable(true);
+        container = new JPanel();
+        container.setLayout(cardLayout);
+
+        minefieldController = new MinefieldController();
+
+        int panelWidth = ICON_WIDTH * minefieldController.getDefaultWidth();
+        int panelHeight = ICON_HEIGHT * minefieldController.getDefaultHeight();
+
+        container.setPreferredSize(new Dimension(panelWidth, panelHeight));
+        container.add(getGreetingsPanel(), "greetings");
+
+        mainWindow = new JFrame("Minesweeper");
+        mainWindow.setResizable(false);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.setLocationRelativeTo(null);
-        mainWindow.setJMenuBar(createMenuBar());
-        mainWindow.add(minefieldPanel(9, 9));
+        mainWindow.setJMenuBar(getMainMenu());
+        mainWindow.add(container);
     }
 
     public void showGUI() {
@@ -30,11 +54,20 @@ public class GUI {
         });
     }
 
-    private JMenuBar createMenuBar() {
+    private JMenuBar getMainMenu() {
         JMenu file = new JMenu("File");
 
         JMenuItem newGame = new JMenuItem("New game");
         file.add(newGame);
+
+        newGame.addActionListener(e -> {
+            String[][] minefield = MinefieldController.getMineField();
+            //Окно с вводом размера поля и колличеством бомб
+            container.add(getMinefield(9, 9), "minefield");
+            cardLayout.show(container, "minefield");
+
+            System.out.println("Game started!");
+        });
 
         JMenuItem highScore = new JMenuItem("High score");
         file.add(highScore);
@@ -55,46 +88,53 @@ public class GUI {
         return menuBar;
     }
 
-    private JPanel minefieldPanel(int row, int cols) {
-        int hgap = 0;
-        int vgap = 0;
-        GridLayout layout = new GridLayout(row, cols, hgap, vgap);
+    private JPanel getGreetingsPanel() {
+//        JPanel greetings = new JPanel();
+
+        return new JPanel();
+    }
+
+    private JPanel getMinefield(int row, int cols) {
+        GridLayout layout = new GridLayout(row, cols, ICON_H_GAP, ICON_V_GAP);
 
         JPanel panel = new JPanel();
-
-        int iconWidth = 40;
-        int iconHeight = 40;
-        int width = iconWidth * row + hgap * (row - 1);
-        int height = iconHeight * cols + vgap * (cols - 1);;
-
-        panel.setPreferredSize(new Dimension(width, height));
         panel.setLayout(layout);
 
-        String iconName = "D:\\__Java\\IdeaProjects\\Minesweeper\\src\\com\\kosenko\\minesweeper\\resources\\tile2.png";
-        Icon tile = new ImageIcon(iconName);
+        Icon tile = new ImageIcon("src/com/kosenko/minesweeper/resources/tile2.png");
+        Icon rollOver = new ImageIcon("src/com/kosenko/minesweeper/resources/rollOverTile.png");
+        Icon bomb = new ImageIcon("src/com/kosenko/minesweeper/resources/mine.png");
+        Icon flag = new ImageIcon("src/com/kosenko/minesweeper/resources/flag1.png");
+
         for (int i = 0; i < row * cols; i++) {
             JButton button = new JButton(tile);
             button.setBorderPainted(false);
-            button.setPreferredSize(new Dimension(iconWidth, iconHeight));
+            button.setFocusPainted(false);
+            button.setContentAreaFilled(false);
+            button.setRolloverIcon(rollOver);
+            button.setPreferredSize(new Dimension(ICON_WIDTH, ICON_HEIGHT));
+
+            button.addActionListener(e -> {
+                System.out.printf("X: %d Y: %d%n", button.getX(), button. getY());
+
+                button.setEnabled(false);
+                button.setDisabledIcon(bomb);
+            });
+
+            button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    super.mouseClicked(e);
+
+                    if (e.getButton() == MouseEvent.BUTTON2 || e.getButton() == MouseEvent.BUTTON3) {
+                        button.setIcon(flag);
+                        button.setRolloverIcon(flag);
+                    }
+                }
+            });
 
             panel.add(button);
         }
 
         return panel;
     }
-
-/*    private JPanel createGridPanel() {
-        Image bomb = new ImageIcon("D:\\__Java\\IdeaProjects\\Minesweeper\\src\\com\\kosenko\\minesweeper\\resources\\bomb.png").getImage();
-
-        JPanel panel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                g.drawImage(bomb, 0, 0, this);
-            }
-        };
-
-        panel.setPreferredSize(new Dimension(500, 500));
-
-        return panel;
-    } */
 }
