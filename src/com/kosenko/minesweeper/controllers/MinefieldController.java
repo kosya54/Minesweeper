@@ -16,6 +16,34 @@ public class MinefieldController {
         return DEFAULT_HEIGHT;
     }
 
+    public int getDefaultCountMines() {
+        return DEFAULT_COUNT_MINES;
+    }
+
+    public static boolean isNumber(String enteredNumber) {
+        if (enteredNumber.equals("")) {
+            return false;
+        }
+
+        for (int i = 0; i < enteredNumber.length(); i++) {
+            if (!Character.isDigit(enteredNumber.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static int[] getMineFieldParam(String width, String height, String countBomb) throws NumberFormatException {
+        int[] param = new int[3];
+
+        param[0] = Integer.parseInt(width);
+        param[1] = Integer.parseInt(height);
+        param[2] = Integer.parseInt(countBomb);
+
+        return param;
+    }
+
     public static String[][] getMineField() {
         Cell cell = new Cell();
         Minefield minefield = new Minefield(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_COUNT_MINES, cell);
@@ -23,3 +51,4 @@ public class MinefieldController {
         return minefield.generateMinefield();
     }
 }
+
