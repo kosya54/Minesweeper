@@ -37,6 +37,7 @@ public class GUI {
         container.add(getGreetingsPanel(), "greetings");
 
         mainWindow = new JFrame("Minesweeper");
+        mainWindow.setSize(panelWidth, panelHeight);
         mainWindow.setResizable(false);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.setJMenuBar(getMainMenu());
@@ -52,7 +53,7 @@ public class GUI {
             }
 
             mainWindow.setVisible(true);
-            mainWindow.pack();
+//            mainWindow.pack();
             mainWindow.setLocationRelativeTo(null);
         });
     }
@@ -67,7 +68,11 @@ public class GUI {
             NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game", true);
             newGameDialog.setVisible(true);
 
-            JPanel minefield = getMinefield(9, 9);
+            int[] param = newGameDialog.getDialogData();
+
+            JPanel minefield = getMinefield(param[0], param[1]);
+            mainWindow.setSize((ICON_WIDTH * param[0]) + 20, (ICON_HEIGHT * param[1]) + 20);
+
             container.add(minefield, "minefield");
             cardLayout.show(container,"minefield");
 
@@ -114,7 +119,8 @@ public class GUI {
             button.setFocusPainted(false);
             button.setContentAreaFilled(false);
             button.setRolloverIcon(rollOver);
-            button.setPreferredSize(new Dimension(ICON_WIDTH, ICON_HEIGHT));
+            button.setSize(ICON_WIDTH, ICON_HEIGHT);
+//            button.setPreferredSize(new Dimension(ICON_WIDTH, ICON_HEIGHT));
 
             button.addActionListener(e -> {
                 System.out.printf("X: %d Y: %d%n", button.getX(), button.getY());
@@ -200,7 +206,11 @@ public class GUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
+                setDialogData(0, width.getText());
+                setDialogData(1, height.getText());
+                setDialogData(2, countBomb.getText());
 
+                dispose();
             }
 
             if (e.getSource() == cancel) {
