@@ -21,10 +21,6 @@ public class MinefieldController {
     }
 
     public static boolean isNumber(String enteredNumber) {
-        if (enteredNumber.equals("")) {
-            return false;
-        }
-
         for (int i = 0; i < enteredNumber.length(); i++) {
             if (!Character.isDigit(enteredNumber.charAt(i))) {
                 return false;
@@ -34,7 +30,11 @@ public class MinefieldController {
         return true;
     }
 
-    public static int[] getMineFieldParam(String width, String height, String countBomb) throws NumberFormatException {
+    public static int getInt(String value) throws NumberFormatException {
+        return Integer.parseInt(value);
+    }
+
+/*    public static int[] getMineFieldParam(String width, String height, String countBomb) throws NumberFormatException {
         int[] param = new int[3];
 
         param[0] = Integer.parseInt(width);
@@ -42,7 +42,7 @@ public class MinefieldController {
         param[2] = Integer.parseInt(countBomb);
 
         return param;
-    }
+    } */
 
     public static String[][] getMineField() {
         Cell cell = new Cell();

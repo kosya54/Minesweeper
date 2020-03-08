@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 public class GUI {
     private JFrame mainWindow;
@@ -62,13 +63,15 @@ public class GUI {
         JMenuItem newGame = new JMenuItem("New game");
         file.add(newGame);
 
-        newGame.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game");
-                newGameDialog.setVisible(true);
+        newGame.addActionListener(e -> {
+            NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game", true);
+            newGameDialog.setVisible(true);
 
-                System.out.println(newGameDialog.getDialogData().toString());
-            }
+            JPanel minefield = getMinefield(9, 9);
+            container.add(minefield, "minefield");
+            cardLayout.show(container,"minefield");
+
+            System.out.println(Arrays.toString(newGameDialog.getDialogData()));
         });
 
         JMenuItem highScore = new JMenuItem("High score");
@@ -91,8 +94,6 @@ public class GUI {
     }
 
     private JPanel getGreetingsPanel() {
-//        JPanel greetings = new JPanel();
-
         return new JPanel();
     }
 
@@ -102,10 +103,10 @@ public class GUI {
         JPanel panel = new JPanel();
         panel.setLayout(layout);
 
-        Icon tile = new ImageIcon("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/tile2.png");
-        Icon rollOver = new ImageIcon("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/rollOverTile.png");
-        Icon bomb = new ImageIcon("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/mine.png");
-        Icon flag = new ImageIcon("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/flag1.png");
+        Icon tile = new ImageIcon("src/com/kosenko/minesweeper/resources/tile2.png");
+        Icon rollOver = new ImageIcon("src/com/kosenko/minesweeper/resources/rollOverTile.png");
+        Icon bomb = new ImageIcon("src/com/kosenko/minesweeper/resources/mine.png");
+        Icon flag = new ImageIcon("src/com/kosenko/minesweeper/resources/flag1.png");
 
         for (int i = 0; i < row * cols; i++) {
             JButton button = new JButton(tile);
@@ -116,7 +117,7 @@ public class GUI {
             button.setPreferredSize(new Dimension(ICON_WIDTH, ICON_HEIGHT));
 
             button.addActionListener(e -> {
-                System.out.printf("X: %d Y: %d%n", button.getX(), button. getY());
+                System.out.printf("X: %d Y: %d%n", button.getX(), button.getY());
 
                 button.setEnabled(false);
                 button.setDisabledIcon(bomb);
@@ -151,9 +152,9 @@ public class GUI {
         private JButton ok;
         private JButton cancel;
 
-        public NewGameDialog(JFrame parent, String name) {
-            super(parent, name);
-         
+        public NewGameDialog(JFrame parent, String name, boolean modal) {
+            super(parent, name, modal);
+
             width = new JTextField(FIELD_SIZE);
             height = new JTextField(FIELD_SIZE);
             countBomb = new JTextField(FIELD_SIZE);
@@ -184,87 +185,28 @@ public class GUI {
             return dialogData;
         }
 
+        private void setDialogData(int index, String value) {
+            if (value.equals("")) {
+                dialogData[index] = minefieldController.getDefaultWidth();
+                System.out.println(dialogData[index]);
+            } else if (MinefieldController.isNumber(value)) {
+                dialogData[index] = MinefieldController.getInt(value);
+                System.out.println(dialogData[index]);
+            } else {
+                JOptionPane.showMessageDialog(this, "Введите число.");
+            }
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
-                if (width.getText().equals("")) {
-                    dialogData[0] = minefieldController.getDefaultWidth();
-                }
 
-                if (height.getText().equals("")) {
-                    dialogData[1] = minefieldController.getDefaultHeight();
-                }
-
-                if (countBomb.getText().equals("")) {
-                    dialogData[2] = minefieldController.getDefaultCountMines();
-                }
-
-                if (MinefieldController.isNumber(width.getText()) && MinefieldController.isNumber(height.getText()) && MinefieldController.isNumber(countBomb.getText())) {
-                    System.out.println(MinefieldController.isNumber(width.getText()));
-                    try {
-                        dialogData = MinefieldController.getMineFieldParam(width.getText(), height.getText(), countBomb.getText());
-                    } catch(NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage() + "111");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Введите число.");
-
-                    return;
-                }
             }
 
             if (e.getSource() == cancel) {
-                System.exit(0);
+                dispose();
             }
-            
-            dispose();
         }
-
-/*        public void showNewGameDialog() {
-            add(width);
-            add(height);
-            add(countBomb);
-            add(ok);
-            add(cancel);
-
-            GridLayout layout = new GridLayout(5, 1, ICON_H_GAP, ICON_V_GAP);
-
-            setLayout(layout);
-            setLocationRelativeTo(null);
-            setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            setSize(200, 200);
-            setVisible(true);
-            setLocationRelativeTo(null);
-        } */
     }
-
-/*    private Dialog getNewGameDialog() {
-        JDialog newGame = new JDialog(mainWindow, "New Game");
-        
-        JTextField width = new JTextField(20);
-        JTextField height = new JTextField(20);
-        JTextField countBomb = new JTextField(20);
-        
-        JButton ok = new JButton("ok");
-        JButton cancel = new JButton("cancel");
-
-        newGame.add(width);
-        newGame.add(height);
-        newGame.add(countBomb);
-        newGame.add(ok);
-        newGame.add(cancel);
-
-        GridLayout layout = new GridLayout(5, 1, ICON_H_GAP, ICON_V_GAP);
-
-        newGame.setLayout(layout);
-        newGame.setLocationRelativeTo(null);
-        newGame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        newGame.setSize(200, 200);
-//        newGame.setVisible(true);
-//        newGame.pack();
-        newGame.setLocationRelativeTo(null);
-
-        return newGame;
-    } */
 }
 
