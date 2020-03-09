@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class GUI {
     private JFrame mainWindow;
-    private JPanel container;
+    private JPanel cardContainer;
     private CardLayout cardLayout;
 
     private MinefieldController minefieldController;
@@ -21,27 +21,29 @@ public class GUI {
     private final static int ICON_HEIGHT = 40;
     private final static int ICON_V_GAP = 0;
     private final static int ICON_H_GAP = 0;
+    private final static int MENU_HEIGHT = 30;
+
+    private int defaultWidth;
+    private int defaultHeight;
 
     public GUI() {
+        minefieldController = new MinefieldController();
+        defaultWidth = ICON_WIDTH * minefieldController.getDefaultColumns();
+        defaultHeight = ICON_HEIGHT * minefieldController.getDefaultRows();
+
         cardLayout = new CardLayout();
 
-        container = new JPanel();
-        container.setLayout(cardLayout);
-
-        minefieldController = new MinefieldController();
-
-        int panelWidth = ICON_WIDTH * minefieldController.getDefaultWidth();
-        int panelHeight = ICON_HEIGHT * minefieldController.getDefaultHeight();
-
-        container.setPreferredSize(new Dimension(panelWidth, panelHeight));
-        container.add(getGreetingsPanel(), "greetings");
+        cardContainer = new JPanel();
+        cardContainer.setLayout(cardLayout);
+        cardContainer.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
+        cardContainer.add(getGreetingsPanel(), "greetings");
 
         mainWindow = new JFrame("Minesweeper");
-        mainWindow.setSize(panelWidth, panelHeight);
+        mainWindow.setSize(defaultWidth, defaultHeight + MENU_HEIGHT);
         mainWindow.setResizable(false);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.setJMenuBar(getMainMenu());
-        mainWindow.add(container);
+        mainWindow.add(cardContainer);
     }
 
     public void showGUI() {
@@ -53,7 +55,6 @@ public class GUI {
             }
 
             mainWindow.setVisible(true);
-//            mainWindow.pack();
             mainWindow.setLocationRelativeTo(null);
         });
     }
@@ -70,13 +71,13 @@ public class GUI {
 
             int[] param = newGameDialog.getDialogData();
 
-            JPanel minefield = getMinefield(param[0], param[1]);
-            mainWindow.setSize((ICON_WIDTH * param[0]) + 20, (ICON_HEIGHT * param[1]) + 20);
+            JPanel minefield = getMinefield(param[0], param[1], param[2]);
+            mainWindow.setSize((ICON_WIDTH * param[0]), (ICON_HEIGHT * param[1]) + MENU_HEIGHT);
 
-            container.add(minefield, "minefield");
-            cardLayout.show(container,"minefield");
+            cardContainer.add(minefield, "minefield");
+            cardLayout.show(cardContainer,"minefield");
 
-            System.out.println(Arrays.toString(newGameDialog.getDialogData()));
+//            System.out.println(Arrays.toString(newGameDialog.getDialogData()));
         });
 
         JMenuItem highScore = new JMenuItem("High score");
@@ -93,6 +94,8 @@ public class GUI {
         exit.addActionListener(e -> System.exit(0));
 
         JMenuBar menuBar = new JMenuBar();
+        menuBar.setPreferredSize(new Dimension(defaultWidth, MENU_HEIGHT));
+        menuBar.setBorder(BorderFactory.createMatteBorder(1, 0, 2, 0, Color.LIGHT_GRAY));
         menuBar.add(file);
 
         return menuBar;
@@ -102,7 +105,7 @@ public class GUI {
         return new JPanel();
     }
 
-    private JPanel getMinefield(int row, int cols) {
+    private JPanel getMinefield(int row, int cols, int countBomb) {
         GridLayout layout = new GridLayout(row, cols, ICON_H_GAP, ICON_V_GAP);
 
         JPanel panel = new JPanel();
@@ -113,35 +116,39 @@ public class GUI {
         Icon bomb = new ImageIcon("src/com/kosenko/minesweeper/resources/mine.png");
         Icon flag = new ImageIcon("src/com/kosenko/minesweeper/resources/flag1.png");
 
-        for (int i = 0; i < row * cols; i++) {
-            JButton button = new JButton(tile);
-            button.setBorderPainted(false);
-            button.setFocusPainted(false);
-            button.setContentAreaFilled(false);
-            button.setRolloverIcon(rollOver);
-            button.setSize(ICON_WIDTH, ICON_HEIGHT);
-//            button.setPreferredSize(new Dimension(ICON_WIDTH, ICON_HEIGHT));
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < cols; j++) {
+                JButton button = new JButton(tile);
+                button.setBorderPainted(false);
+                button.setFocusPainted(false);
+                button.setContentAreaFilled(false);
+                button.setRolloverIcon(rollOver);
+                button.setSize(ICON_WIDTH, ICON_HEIGHT);
 
-            button.addActionListener(e -> {
-                System.out.printf("X: %d Y: %d%n", button.getX(), button.getY());
+                int finalI = i;
+                int finalJ = j;
+                button.addActionListener(e -> {
+                    System.out.println("i: " + finalI + " j: " + finalJ);
 
-                button.setEnabled(false);
-                button.setDisabledIcon(bomb);
-            });
 
-            button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    super.mouseClicked(e);
 
-                    if (e.getButton() == MouseEvent.BUTTON2 || e.getButton() == MouseEvent.BUTTON3) {
-                        button.setIcon(flag);
-                        button.setRolloverIcon(flag);
+                    button.setEnabled(false);
+                    button.setDisabledIcon(bomb);
+                });
+
+                button.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        super.mouseClicked(e);
+
+                        if (e.getButton() == MouseEvent.BUTTON2 || e.getButton() == MouseEvent.BUTTON3) {
+                            button.setIcon(flag);
+                            button.setRolloverIcon(flag);
+                        }
                     }
-                }
-            });
-
-            panel.add(button);
+                });
+                panel.add(button);
+            }
         }
 
         return panel;
@@ -193,7 +200,7 @@ public class GUI {
 
         private void setDialogData(int index, String value) {
             if (value.equals("")) {
-                dialogData[index] = minefieldController.getDefaultWidth();
+                dialogData[index] = minefieldController.getDefaultColumns();
                 System.out.println(dialogData[index]);
             } else if (MinefieldController.isNumber(value)) {
                 dialogData[index] = MinefieldController.getInt(value);

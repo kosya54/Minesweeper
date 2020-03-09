@@ -1,19 +1,18 @@
 package com.kosenko.minesweeper.controllers;
 
-import com.kosenko.minesweeper.models.Cell;
 import com.kosenko.minesweeper.models.Minefield;
 
 public class MinefieldController {
-    private final static int DEFAULT_WIDTH = 9;
-    private final static int DEFAULT_HEIGHT = 9;
+    private final static int DEFAULT_COLUMNS = 9;
+    private final static int DEFAULT_ROWS = 9;
     private final static int DEFAULT_COUNT_MINES = 10;
 
-    public int getDefaultWidth() {
-        return DEFAULT_WIDTH;
+    public int getDefaultColumns() {
+        return DEFAULT_COLUMNS;
     }
 
-    public int getDefaultHeight() {
-        return DEFAULT_HEIGHT;
+    public int getDefaultRows() {
+        return DEFAULT_ROWS;
     }
 
     public int getDefaultCountMines() {
@@ -34,19 +33,8 @@ public class MinefieldController {
         return Integer.parseInt(value);
     }
 
-/*    public static int[] getMineFieldParam(String width, String height, String countBomb) throws NumberFormatException {
-        int[] param = new int[3];
-
-        param[0] = Integer.parseInt(width);
-        param[1] = Integer.parseInt(height);
-        param[2] = Integer.parseInt(countBomb);
-
-        return param;
-    } */
-
-    public static String[][] getMineField() {
-        Cell cell = new Cell();
-        Minefield minefield = new Minefield(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_COUNT_MINES, cell);
+    public static int[][] getMineField() {
+        Minefield minefield = new Minefield(DEFAULT_COLUMNS, DEFAULT_ROWS, DEFAULT_COUNT_MINES);
 
         return minefield.generateMinefield();
     }

@@ -14,10 +14,10 @@ public class Main {
         Cell cell = new Cell();
         Minefield minefield = new Minefield(width, height, countMines, cell);
 
-        String[][] array = minefield.generateMinefield();
+        int[][] array = minefield.generateMinefield();
 
-        for (String[] arr : array) {
-            for (String value : arr) {
+        for (int[] arr : array) {
+            for (int value : arr) {
                 System.out.print(value);
             }
             System.out.println();
