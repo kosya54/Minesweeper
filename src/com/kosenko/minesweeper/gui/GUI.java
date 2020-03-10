@@ -165,16 +165,15 @@ public class GUI {
     }
 
     private void openCells(Cell[][] cells, int[][] minefield, int x, int y) {
-        showLeftCells(cells, minefield, x, y);
         showTopCells(cells, minefield, x, y);
-        showRightCells(cells, minefield, x, y);
+        showBottomCells(cells, minefield, x, y);
     }
 
     private void showLeftCells(Cell[][] cells, int[][] minefield, int x, int y) {
         int j = x;
         while (j >= 0) {
             if (minefield[y][j] > 0) {
-                continue;
+                break;
             }
 
             showEmptyCell(cells, minefield, j, y);
@@ -186,10 +185,11 @@ public class GUI {
         int i = y;
         while (i >= 0) {
             if (minefield[i][x] > 0) {
-                continue;
+                break;
             }
 
-            showEmptyCell(cells, minefield, x, i);
+            showLeftCells(cells, minefield, x, i);
+            showRightCells(cells, minefield, x, i);
             --i;
         }
     }
@@ -198,11 +198,24 @@ public class GUI {
         int j = x;
         while (j < minefield[y].length) {
             if (minefield[y][j] > 0) {
-                continue;
+                break;
             }
 
             showEmptyCell(cells, minefield, j, y);
             ++j;
+        }
+    }
+
+    private void showBottomCells(Cell[][] cells, int[][] minefield, int x, int y) {
+        int i = y;
+        while (i < minefield.length) {
+            if (minefield[i][x] > 0) {
+                break;
+            }
+
+            showLeftCells(cells, minefield, x, i);
+            showRightCells(cells, minefield, x, i);
+            ++i;
         }
     }
 
