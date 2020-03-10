@@ -3,16 +3,20 @@ package com.kosenko.minesweeper.models;
 import java.util.Random;
 
 public class Minefield {
+    private final static int MINE = -1;
+
     private int columns;
     private int rows;
     private int countMines;
-    private int bomb;
 
     public Minefield(int columns, int rows, int countMines) {
         this.columns = columns;
         this.rows = rows;
         this.countMines = countMines;
-        bomb = -1;
+    }
+
+    public static int getMine() {
+        return MINE;
     }
 
     private int[][] generateEmptyMinefield() {
@@ -35,8 +39,8 @@ public class Minefield {
             int i = random.nextInt(rows - 1);
             int j = random.nextInt(columns - 1);
 
-            if (minefield[i][j] != bomb) {
-                minefield[i][j] = bomb;
+            if (minefield[i][j] != MINE) {
+                minefield[i][j] = MINE;
                 ++count;
             }
         }
@@ -48,7 +52,7 @@ public class Minefield {
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (minefield[i][j]== bomb) {
+                if (minefield[i][j]== MINE) {
                     continue;
                 }
 
@@ -59,7 +63,7 @@ public class Minefield {
                 //Север
                 y = i - 1;
                 if (y < rows && y >= 0) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -67,7 +71,7 @@ public class Minefield {
                 //Юг
                 y = i + 1;
                 if (y >= 0 && y < rows) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -76,7 +80,7 @@ public class Minefield {
                 x = j - 1;
                 y = i;
                 if (x < columns && x >= 0) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -84,7 +88,7 @@ public class Minefield {
                 //Восток
                 x = j + 1;
                 if ((x >= 0 && x < columns)) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -93,7 +97,7 @@ public class Minefield {
                 x = j + 1;
                 y = i - 1;
                 if (y >= 0 && y < rows && x >= 0 && x < columns) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -101,7 +105,7 @@ public class Minefield {
                 //Юго-восток
                 y = i + 1;
                 if (y >= 0 && y < rows && x >= 0 && x < columns) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -110,7 +114,7 @@ public class Minefield {
                 x = j - 1;
                 y = i - 1;
                 if (y < rows && y >= 0 && x < columns && x >= 0) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }
@@ -118,7 +122,7 @@ public class Minefield {
                 //Юго-запад
                 y = i + 1;
                 if (y < rows && y >= 0 && x < columns && x >= 0) {
-                    if (minefield[y][x] == bomb) {
+                    if (minefield[y][x] == MINE) {
                         ++count;
                     }
                 }

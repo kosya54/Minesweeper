@@ -15,7 +15,7 @@ public class GUI {
     private JPanel cardContainer;
     private CardLayout cardLayout;
 
-    private MinefieldController minefieldController;
+//    private MinefieldController minefieldController;
 
     private final static int ICON_WIDTH = 40;
     private final static int ICON_HEIGHT = 40;
@@ -27,9 +27,9 @@ public class GUI {
     private int defaultHeight;
 
     public GUI() {
-        minefieldController = new MinefieldController();
-        defaultWidth = ICON_WIDTH * minefieldController.getDefaultColumns();
-        defaultHeight = ICON_HEIGHT * minefieldController.getDefaultRows();
+//        minefieldController = new MinefieldController();
+        defaultWidth = ICON_WIDTH * MinefieldController.getDefaultColumns();
+        defaultHeight = ICON_HEIGHT * MinefieldController.getDefaultRows();
 
         cardLayout = new CardLayout();
 
@@ -37,6 +37,7 @@ public class GUI {
         cardContainer.setLayout(cardLayout);
         cardContainer.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
         cardContainer.add(getGreetingsPanel(), "greetings");
+        cardContainer.add(getHighScorePanel(), "highScore");
 
         mainWindow = new JFrame("Minesweeper");
         mainWindow.setSize(defaultWidth, defaultHeight + MENU_HEIGHT);
@@ -76,8 +77,6 @@ public class GUI {
 
             cardContainer.add(minefield, "minefield");
             cardLayout.show(cardContainer,"minefield");
-
-//            System.out.println(Arrays.toString(newGameDialog.getDialogData()));
         });
 
         JMenuItem highScore = new JMenuItem("High score");
@@ -105,56 +104,134 @@ public class GUI {
         return new JPanel();
     }
 
-    private JPanel getMinefield(int row, int cols, int countBomb) {
-        GridLayout layout = new GridLayout(row, cols, ICON_H_GAP, ICON_V_GAP);
+    private JPanel getHighScorePanel() {
+        return new JPanel();
+    }
+
+    private JPanel getMinefield(int columns, int rows, int countMines) {
+        GridLayout layout = new GridLayout(rows, columns, ICON_H_GAP, ICON_V_GAP);
 
         JPanel panel = new JPanel();
         panel.setLayout(layout);
 
-        Icon tile = new ImageIcon("src/com/kosenko/minesweeper/resources/tile2.png");
-        Icon rollOver = new ImageIcon("src/com/kosenko/minesweeper/resources/rollOverTile.png");
-        Icon bomb = new ImageIcon("src/com/kosenko/minesweeper/resources/mine.png");
-        Icon flag = new ImageIcon("src/com/kosenko/minesweeper/resources/flag1.png");
+        int[][] minefield = MinefieldController.getMineField(columns, rows, countMines);
+        temporaryShowMinefieldArray(minefield);
 
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < cols; j++) {
-                JButton button = new JButton(tile);
-                button.setBorderPainted(false);
-                button.setFocusPainted(false);
-                button.setContentAreaFilled(false);
-                button.setRolloverIcon(rollOver);
-                button.setSize(ICON_WIDTH, ICON_HEIGHT);
+        Cell[][] cells = new Cell[rows][columns];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                Cell cell = new Cell();
+                cell.setTile();
+                cell.setPositionX(j);
+                cell.setPositionY(i);
 
-                int finalI = i;
-                int finalJ = j;
-                button.addActionListener(e -> {
-                    System.out.println("i: " + finalI + " j: " + finalJ);
+                cell.addActionListener(e -> {
+//                    System.out.println("X: " + cell.getPositionX() + " Y: " + cell.getPositionY());
 
+                    if (minefield[cell.getPositionY()][cell.getPositionX()] == MinefieldController.getMineValue()) {
+                        cell.setMine();
 
+                        JOptionPane.showMessageDialog(panel, "Game over!");
+                        cardLayout.show(cardContainer,"highScore");
+                    }
 
-                    button.setEnabled(false);
-                    button.setDisabledIcon(bomb);
+                    if (minefield[cell.getPositionY()][cell.getPositionX()] != 0
+                            && minefield[cell.getPositionY()][cell.getPositionX()] != MinefieldController.getMineValue()) {
+                        cell.setNumber(minefield[cell.getPositionY()][cell.getPositionX()]);
+
+                        return;
+                    }
+
+                    openCells(cells, minefield, cell.getPositionX(), cell.getPositionY());
                 });
 
-                button.addMouseListener(new MouseAdapter() {
+                cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
 
                         if (e.getButton() == MouseEvent.BUTTON2 || e.getButton() == MouseEvent.BUTTON3) {
-                            button.setIcon(flag);
-                            button.setRolloverIcon(flag);
+                            cell.setFlag();
                         }
                     }
                 });
-                panel.add(button);
+
+                cells[i][j] = cell;
+                panel.add(cell);
             }
         }
 
         return panel;
     }
 
-    private class NewGameDialog extends JDialog implements ActionListener {
+    private void openCells(Cell[][] cells, int[][] minefield, int x, int y) {
+        showLeftCells(cells, minefield, x, y);
+        showTopCells(cells, minefield, x, y);
+        showRightCells(cells, minefield, x, y);
+    }
+
+    private void showLeftCells(Cell[][] cells, int[][] minefield, int x, int y) {
+        int j = x;
+        while (j >= 0) {
+            if (minefield[y][j] > 0) {
+                continue;
+            }
+
+            showEmptyCell(cells, minefield, j, y);
+            --j;
+        }
+    }
+
+    private void showTopCells(Cell[][] cells, int[][] minefield, int x, int y) {
+        int i = y;
+        while (i >= 0) {
+            if (minefield[i][x] > 0) {
+                continue;
+            }
+
+            showEmptyCell(cells, minefield, x, i);
+            --i;
+        }
+    }
+
+    private void showRightCells(Cell[][] cells, int[][] minefield, int x, int y) {
+        int j = x;
+        while (j < minefield[y].length) {
+            if (minefield[y][j] > 0) {
+                continue;
+            }
+
+            showEmptyCell(cells, minefield, j, y);
+            ++j;
+        }
+    }
+
+    private void showEmptyCell(Cell[][] cells, int[][] minefield, int x, int y) {
+        for (int i = y - 1; i <= y + 1; i++) {
+            if (i >= minefield.length || i < 0) {
+                continue;
+            }
+
+            for (int j = x - 1; j <= x + 1; j++) {
+                if (j >= minefield[i].length || j < 0) {
+                    continue;
+                }
+
+                if (minefield[i][j] >= 0) {
+                    cells[i][j].setNumber(minefield[i][j]);
+//                    break;
+                }
+            }
+        }
+    }
+
+    private void temporaryShowMinefieldArray(int[][] minefield) {
+        for (int[] array : minefield) {
+            System.out.println(Arrays.toString(array));
+        }
+    }
+
+    private static class NewGameDialog extends JDialog implements ActionListener {
         private JTextField width;
         private JTextField height;
         private JTextField countBomb;
@@ -200,7 +277,7 @@ public class GUI {
 
         private void setDialogData(int index, String value) {
             if (value.equals("")) {
-                dialogData[index] = minefieldController.getDefaultColumns();
+                dialogData[index] = MinefieldController.getDefaultColumns();
                 System.out.println(dialogData[index]);
             } else if (MinefieldController.isNumber(value)) {
                 dialogData[index] = MinefieldController.getInt(value);
