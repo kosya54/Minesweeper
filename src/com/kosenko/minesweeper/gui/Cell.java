@@ -6,7 +6,8 @@ public class Cell extends JButton {
     private final static int WIDTH = 40;
     private final static int HEIGHT = 40;
     private final static int COUNT_NUMBERS = 10;
-    private final static String ICONS_PATH = "src/com/kosenko/minesweeper/resources/";
+//    private final static String ICONS_PATH = "src/com/kosenko/minesweeper/resources/";
+    private final static String ICONS_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/";
     private final static String FILE_EXTENSION = ".png";
 
     private Icon tile;
@@ -19,6 +20,8 @@ public class Cell extends JButton {
 
     private int x;
     private int y;
+
+    private boolean isOpened;
 
     public Cell() {
         tile = new ImageIcon(ICONS_PATH + "tile" + FILE_EXTENSION);
@@ -33,6 +36,8 @@ public class Cell extends JButton {
         for (int i = 1; i < COUNT_NUMBERS; i++) {
             numbers[i] = new ImageIcon(ICONS_PATH + "num" + i + FILE_EXTENSION);
         }
+
+        isOpened = false;
 
         setParams();
     }
@@ -75,10 +80,13 @@ public class Cell extends JButton {
         setDisabledIcon(mine);
     }
 
-/*    public void setEmpty() {
-        setEnabled(false);
-        setIcon(empty);
-    } */
+    public void setIsOpened(boolean isOpened) {
+        this.isOpened = isOpened;
+    }
+
+    public boolean getIsOpened() {
+        return isOpened;
+    }
 
     public void setNumber(int index) {
         setEnabled(false);
