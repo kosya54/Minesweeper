@@ -132,6 +132,7 @@ public class Minefield {
                 }
             }
         }
+
         return minefield;
     }
 }

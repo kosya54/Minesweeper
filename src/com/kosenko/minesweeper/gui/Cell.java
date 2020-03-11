@@ -6,15 +6,14 @@ public class Cell extends JButton {
     private final static int WIDTH = 40;
     private final static int HEIGHT = 40;
     private final static int COUNT_NUMBERS = 10;
-//    private final static String ICONS_PATH = "src/com/kosenko/minesweeper/resources/";
-    private final static String ICONS_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/";
+    private final static String ICONS_PATH = "src/com/kosenko/minesweeper/resources/";
+    //    private final static String ICONS_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/";
     private final static String FILE_EXTENSION = ".png";
 
     private Icon tile;
     private Icon rollOver;
     private Icon flag;
     private Icon mine;
-    private Icon empty;
 
     private Icon[] numbers;
 
@@ -22,13 +21,15 @@ public class Cell extends JButton {
     private int y;
 
     private boolean isOpened;
+    private boolean isFlagged;
 
     public Cell() {
         tile = new ImageIcon(ICONS_PATH + "tile" + FILE_EXTENSION);
         rollOver = new ImageIcon(ICONS_PATH + "rollOverTile" + FILE_EXTENSION);
         flag = new ImageIcon(ICONS_PATH + "flag" + FILE_EXTENSION);
         mine = new ImageIcon(ICONS_PATH + "mine" + FILE_EXTENSION);
-        empty = new ImageIcon(ICONS_PATH + "empty" + FILE_EXTENSION);
+
+        Icon empty = new ImageIcon(ICONS_PATH + "empty" + FILE_EXTENSION);
 
         numbers = new Icon[COUNT_NUMBERS];
         numbers[0] = empty;
@@ -38,6 +39,7 @@ public class Cell extends JButton {
         }
 
         isOpened = false;
+        isFlagged = false;
 
         setParams();
     }
@@ -68,11 +70,7 @@ public class Cell extends JButton {
 
     public void setTile() {
         setIcon(tile);
-    }
-
-    public void setFlag() {
-        setIcon(flag);
-        setRolloverIcon(flag);
+        setRolloverIcon(rollOver);
     }
 
     public void setMine() {
@@ -80,12 +78,25 @@ public class Cell extends JButton {
         setDisabledIcon(mine);
     }
 
-    public void setIsOpened(boolean isOpened) {
-        this.isOpened = isOpened;
+    public void setOpened() {
+        isOpened = true;
     }
 
-    public boolean getIsOpened() {
+    public boolean isOpened() {
         return isOpened;
+    }
+
+    public void setFlag() {
+        setIcon(flag);
+        setRolloverIcon(flag);
+    }
+
+    public void setFlagged(boolean isFlagged) {
+        this.isFlagged = isFlagged;
+    }
+
+    public boolean isFlagged() {
+        return isFlagged;
     }
 
     public void setNumber(int index) {

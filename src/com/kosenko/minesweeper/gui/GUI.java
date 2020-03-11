@@ -15,8 +15,6 @@ public class GUI {
     private JPanel cardContainer;
     private CardLayout cardLayout;
 
-//    private MinefieldController minefieldController;
-
     private final static int ICON_WIDTH = 40;
     private final static int ICON_HEIGHT = 40;
     private final static int ICON_V_GAP = 0;
@@ -27,7 +25,6 @@ public class GUI {
     private int defaultHeight;
 
     public GUI() {
-//        minefieldController = new MinefieldController();
         defaultWidth = ICON_WIDTH * MinefieldController.getDefaultColumns();
         defaultHeight = ICON_HEIGHT * MinefieldController.getDefaultRows();
 
@@ -70,13 +67,13 @@ public class GUI {
             NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game", true);
             newGameDialog.setVisible(true);
 
-            int[] param = newGameDialog.getDialogData();
+            int[] minefieldParameters = newGameDialog.getMinefieldParameters();
 
-            JPanel minefield = getMinefield(param[0], param[1], param[2]);
-            mainWindow.setSize((ICON_WIDTH * param[0]), (ICON_HEIGHT * param[1]) + MENU_HEIGHT);
+            JPanel minefield = getMinefield(minefieldParameters[0], minefieldParameters[1], minefieldParameters[2]);
+            mainWindow.setSize((ICON_WIDTH * minefieldParameters[0]), (ICON_HEIGHT * minefieldParameters[1]) + MENU_HEIGHT);
 
             cardContainer.add(minefield, "minefield");
-            cardLayout.show(cardContainer,"minefield");
+            cardLayout.show(cardContainer, "minefield");
         });
 
         JMenuItem highScore = new JMenuItem("High score");
@@ -121,37 +118,44 @@ public class GUI {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 Cell cell = new Cell();
+
                 cell.setTile();
                 cell.setPositionX(j);
                 cell.setPositionY(i);
-
-                cell.addActionListener(e -> {
-//                    System.out.println("X: " + cell.getPositionX() + " Y: " + cell.getPositionY());
-
-                    if (minefield[cell.getPositionY()][cell.getPositionX()] == MinefieldController.getMineValue()) {
-                        cell.setMine();
-
-                        JOptionPane.showMessageDialog(panel, "Game over!");
-                        cardLayout.show(cardContainer,"highScore");
-                    }
-
-                    if (minefield[cell.getPositionY()][cell.getPositionX()] != 0
-                            && minefield[cell.getPositionY()][cell.getPositionX()] != MinefieldController.getMineValue()) {
-                        cell.setNumber(minefield[cell.getPositionY()][cell.getPositionX()]);
-
-                        return;
-                    }
-
-                    outOfRange(minefield, cell.getPositionX(), cell.getPositionY());
-                });
 
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
 
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            if (cell.isFlagged()) {
+                                cell.setFlagged(false);
+                            }
+
+                            int x = cell.getPositionX();
+                            int y = cell.getPositionY();
+
+                            if (minefield[y][x] == MinefieldController.getMineValue()) {
+                                cell.setMine();
+
+                                JOptionPane.showMessageDialog(panel, "Game over!");
+                                cardLayout.show(cardContainer, "highScore");
+
+                                //TODO: запись high score в файл
+                            }
+
+                            reveal(cells, minefield, x, y, rows, columns);
+                        }
+
                         if (e.getButton() == MouseEvent.BUTTON2 || e.getButton() == MouseEvent.BUTTON3) {
-                            cell.setFlag();
+                            if (!cell.isFlagged()) {
+                                cell.setFlagged(true);
+                                cell.setFlag();
+                            } else {
+                                cell.setFlagged(false);
+                                cell.setTile();
+                            }
                         }
                     }
                 });
@@ -164,25 +168,44 @@ public class GUI {
         return panel;
     }
 
-    private boolean outOfRange(int[][] minefield, int x, int y) {
-        return x < 0 || y < 0 || x >= minefield[y].length || y >= minefield.length;
+    private boolean outOfRange(int x, int y, int rows, int columns) {
+        return x < 0 || y < 0 || x >= columns || y >= rows;
     }
 
-    private int calculateMine(int[][] minefield, int x, int y) {
-        if (outOfRange(minefield, x, y)) {
-            return 0;
+    private void reveal(Cell[][] cells, int[][] minefield, int x, int y, int rows, int columns) {
+        if (outOfRange(x, y, rows, columns)) {
+            return;
         }
 
-        int count = 0;
-        for (int i = y - 1; i <= y + 1; i++) {
-            for (int j = x - 1; j <= x + 1; j++) {
-                if (minefield[i][j] == -1) {
-                    ++count;
-                }
-            }
+        if (minefield[y][x] == MinefieldController.getMineValue()) {
+            return;
         }
 
-        return count;
+        if (cells[y][x].isOpened()) {
+            return;
+        }
+
+        if (cells[y][x].isFlagged()) {
+            return;
+        }
+
+        if (minefield[y][x] > 0) {
+            cells[y][x].setNumber(minefield[y][x]);
+
+            return;
+        }
+
+        cells[y][x].setOpened();
+        cells[y][x].setNumber(minefield[y][x]);
+
+        reveal(cells, minefield, x - 1, y - 1, rows, columns);
+        reveal(cells, minefield, x, y - 1, rows, columns);
+        reveal(cells, minefield, x + 1, y - 1, rows, columns);
+        reveal(cells, minefield, x - 1, y, rows, columns);
+        reveal(cells, minefield, x + 1, y, rows, columns);
+        reveal(cells, minefield, x - 1, y + 1, rows, columns);
+        reveal(cells, minefield, x, y + 1, rows, columns);
+        reveal(cells, minefield, x + 1, y + 1, rows, columns);
     }
 
     private void temporaryShowMinefieldArray(int[][] minefield) {
@@ -192,24 +215,25 @@ public class GUI {
     }
 
     private static class NewGameDialog extends JDialog implements ActionListener {
-        private JTextField width;
-        private JTextField height;
-        private JTextField countBomb;
-        private int[] dialogData;
-
-        private final static int FIELD_SIZE = 20;
+        private JTextField columns;
+        private JTextField rows;
+        private JTextField countMine;
 
         private JButton ok;
         private JButton cancel;
 
+        private int[] minefieldParameters;
+
+        private final static int FIELD_SIZE = 20;
+
         public NewGameDialog(JFrame parent, String name, boolean modal) {
             super(parent, name, modal);
 
-            width = new JTextField(FIELD_SIZE);
-            height = new JTextField(FIELD_SIZE);
-            countBomb = new JTextField(FIELD_SIZE);
+            columns = new JTextField(FIELD_SIZE);
+            rows = new JTextField(FIELD_SIZE);
+            countMine = new JTextField(FIELD_SIZE);
 
-            dialogData = new int[3];
+            minefieldParameters = new int[3];
 
             ok = new JButton("ok");
             ok.addActionListener(this);
@@ -217,9 +241,9 @@ public class GUI {
             cancel = new JButton("cancel");
             cancel.addActionListener(this);
 
-            add(width);
-            add(height);
-            add(countBomb);
+            add(columns);
+            add(rows);
+            add(countMine);
             add(ok);
             add(cancel);
 
@@ -231,17 +255,15 @@ public class GUI {
             setLocationRelativeTo(null);
         }
 
-        public int[] getDialogData() {
-            return dialogData;
+        public int[] getMinefieldParameters() {
+            return minefieldParameters;
         }
 
-        private void setDialogData(int index, String value) {
+        private void setMinefieldParameters(int index, String value) {
             if (value.equals("")) {
-                dialogData[index] = MinefieldController.getDefaultColumns();
-                System.out.println(dialogData[index]);
+                minefieldParameters[index] = MinefieldController.getDefaultColumns();
             } else if (MinefieldController.isNumber(value)) {
-                dialogData[index] = MinefieldController.getInt(value);
-                System.out.println(dialogData[index]);
+                minefieldParameters[index] = MinefieldController.getInt(value);
             } else {
                 JOptionPane.showMessageDialog(this, "Введите число.");
             }
@@ -250,9 +272,9 @@ public class GUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == ok) {
-                setDialogData(0, width.getText());
-                setDialogData(1, height.getText());
-                setDialogData(2, countBomb.getText());
+                setMinefieldParameters(0, columns.getText());
+                setMinefieldParameters(1, rows.getText());
+                setMinefieldParameters(2, countMine.getText());
 
                 dispose();
             }
