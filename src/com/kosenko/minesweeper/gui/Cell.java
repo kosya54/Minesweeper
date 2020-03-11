@@ -3,12 +3,13 @@ package com.kosenko.minesweeper.gui;
 import javax.swing.*;
 
 public class Cell extends JButton {
-    private final static int WIDTH = 40;
-    private final static int HEIGHT = 40;
+    private final static int ICON_WIDTH = 40;
+    private final static int ICON_HEIGHT = 40;
     private final static int COUNT_NUMBERS = 10;
-    private final static String ICONS_PATH = "src/com/kosenko/minesweeper/resources/";
-    //    private final static String ICONS_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/";
+    private final static String ICON_PATH = "src/com/kosenko/minesweeper/resources/";
     private final static String FILE_EXTENSION = ".png";
+
+//    private final static String ICONS_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/";
 
     private Icon tile;
     private Icon rollOver;
@@ -24,18 +25,18 @@ public class Cell extends JButton {
     private boolean isFlagged;
 
     public Cell() {
-        tile = new ImageIcon(ICONS_PATH + "tile" + FILE_EXTENSION);
-        rollOver = new ImageIcon(ICONS_PATH + "rollOverTile" + FILE_EXTENSION);
-        flag = new ImageIcon(ICONS_PATH + "flag" + FILE_EXTENSION);
-        mine = new ImageIcon(ICONS_PATH + "mine" + FILE_EXTENSION);
+        tile = new ImageIcon(ICON_PATH + "tile" + FILE_EXTENSION);
+        rollOver = new ImageIcon(ICON_PATH + "rollOverTile" + FILE_EXTENSION);
+        flag = new ImageIcon(ICON_PATH + "flag" + FILE_EXTENSION);
+        mine = new ImageIcon(ICON_PATH + "mine" + FILE_EXTENSION);
 
-        Icon empty = new ImageIcon(ICONS_PATH + "empty" + FILE_EXTENSION);
+        Icon empty = new ImageIcon(ICON_PATH + "empty" + FILE_EXTENSION);
 
         numbers = new Icon[COUNT_NUMBERS];
         numbers[0] = empty;
 
         for (int i = 1; i < COUNT_NUMBERS; i++) {
-            numbers[i] = new ImageIcon(ICONS_PATH + "num" + i + FILE_EXTENSION);
+            numbers[i] = new ImageIcon(ICON_PATH + "num" + i + FILE_EXTENSION);
         }
 
         isOpened = false;
@@ -49,7 +50,15 @@ public class Cell extends JButton {
         setFocusPainted(false);
         setContentAreaFilled(false);
         setRolloverIcon(rollOver);
-        setSize(WIDTH, HEIGHT);
+        setSize(ICON_WIDTH, ICON_HEIGHT);
+    }
+
+    public static int getIconWidth() {
+        return ICON_WIDTH;
+    }
+
+    public static int getIconHeight() {
+        return ICON_HEIGHT;
     }
 
     public int getPositionX() {

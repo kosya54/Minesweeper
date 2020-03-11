@@ -15,18 +15,21 @@ public class GUI {
     private JPanel cardContainer;
     private CardLayout cardLayout;
 
-    private final static int ICON_WIDTH = 40;
-    private final static int ICON_HEIGHT = 40;
     private final static int ICON_V_GAP = 0;
     private final static int ICON_H_GAP = 0;
     private final static int MENU_HEIGHT = 30;
 
+    private int iconWidth;
+    private int iconHeight;
     private int defaultWidth;
     private int defaultHeight;
 
     public GUI() {
-        defaultWidth = ICON_WIDTH * MinefieldController.getDefaultColumns();
-        defaultHeight = ICON_HEIGHT * MinefieldController.getDefaultRows();
+        iconWidth = Cell.getIconWidth();
+        iconHeight = Cell.getIconHeight();
+
+        defaultWidth = iconWidth * MinefieldController.getDefaultColumns();
+        defaultHeight = iconHeight * MinefieldController.getDefaultRows();
 
         cardLayout = new CardLayout();
 
@@ -70,7 +73,8 @@ public class GUI {
             int[] minefieldParameters = newGameDialog.getMinefieldParameters();
 
             JPanel minefield = getMinefield(minefieldParameters[0], minefieldParameters[1], minefieldParameters[2]);
-            mainWindow.setSize((ICON_WIDTH * minefieldParameters[0]), (ICON_HEIGHT * minefieldParameters[1]) + MENU_HEIGHT);
+            mainWindow.setSize((iconWidth * minefieldParameters[0]), (iconHeight * minefieldParameters[1]) +
+                    MENU_HEIGHT + ICON_H_GAP * minefieldParameters[1]);
 
             cardContainer.add(minefield, "minefield");
             cardLayout.show(cardContainer, "minefield");
@@ -106,7 +110,7 @@ public class GUI {
     }
 
     private JPanel getMinefield(int columns, int rows, int countMines) {
-        GridLayout layout = new GridLayout(rows, columns, ICON_H_GAP, ICON_V_GAP);
+        GridLayout layout = new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP);
 
         JPanel panel = new JPanel();
         panel.setLayout(layout);
@@ -128,6 +132,8 @@ public class GUI {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
 
+                        //TODO: Счетчик открытых бомб и функцию выигрыша
+
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             if (cell.isFlagged()) {
                                 cell.setFlagged(false);
@@ -138,6 +144,8 @@ public class GUI {
 
                             if (minefield[y][x] == MinefieldController.getMineValue()) {
                                 cell.setMine();
+
+                                //TODO: Функцию проигрыша
 
                                 JOptionPane.showMessageDialog(panel, "Game over!");
                                 cardLayout.show(cardContainer, "highScore");
