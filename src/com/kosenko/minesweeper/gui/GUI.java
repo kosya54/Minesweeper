@@ -142,7 +142,7 @@ public class GUI {
                         return;
                     }
 
-                    openCells(cells, minefield, cell.getPositionX(), cell.getPositionY());
+                    outOfRange(minefield, cell.getPositionX(), cell.getPositionY());
                 });
 
                 cell.addMouseListener(new MouseAdapter() {
@@ -164,78 +164,25 @@ public class GUI {
         return panel;
     }
 
-    private void openCells(Cell[][] cells, int[][] minefield, int x, int y) {
-        showTopCells(cells, minefield, x, y);
-        showBottomCells(cells, minefield, x, y);
+    private boolean outOfRange(int[][] minefield, int x, int y) {
+        return x < 0 || y < 0 || x >= minefield[y].length || y >= minefield.length;
     }
 
-    private void showLeftCells(Cell[][] cells, int[][] minefield, int x, int y) {
-        int j = x;
-        while (j >= 0) {
-            if (minefield[y][j] > 0) {
-                break;
-            }
-
-            showEmptyCell(cells, minefield, j, y);
-            --j;
+    private int calculateMine(int[][] minefield, int x, int y) {
+        if (outOfRange(minefield, x, y)) {
+            return 0;
         }
-    }
 
-    private void showTopCells(Cell[][] cells, int[][] minefield, int x, int y) {
-        int i = y;
-        while (i >= 0) {
-            if (minefield[i][x] > 0) {
-                break;
-            }
-
-            showLeftCells(cells, minefield, x, i);
-            showRightCells(cells, minefield, x, i);
-            --i;
-        }
-    }
-
-    private void showRightCells(Cell[][] cells, int[][] minefield, int x, int y) {
-        int j = x;
-        while (j < minefield[y].length) {
-            if (minefield[y][j] > 0) {
-                break;
-            }
-
-            showEmptyCell(cells, minefield, j, y);
-            ++j;
-        }
-    }
-
-    private void showBottomCells(Cell[][] cells, int[][] minefield, int x, int y) {
-        int i = y;
-        while (i < minefield.length) {
-            if (minefield[i][x] > 0) {
-                break;
-            }
-
-            showLeftCells(cells, minefield, x, i);
-            showRightCells(cells, minefield, x, i);
-            ++i;
-        }
-    }
-
-    private void showEmptyCell(Cell[][] cells, int[][] minefield, int x, int y) {
+        int count = 0;
         for (int i = y - 1; i <= y + 1; i++) {
-            if (i >= minefield.length || i < 0) {
-                continue;
-            }
-
             for (int j = x - 1; j <= x + 1; j++) {
-                if (j >= minefield[i].length || j < 0) {
-                    continue;
-                }
-
-                if (minefield[i][j] >= 0) {
-                    cells[i][j].setNumber(minefield[i][j]);
-//                    break;
+                if (minefield[i][j] == -1) {
+                    ++count;
                 }
             }
         }
+
+        return count;
     }
 
     private void temporaryShowMinefieldArray(int[][] minefield) {
@@ -316,4 +263,3 @@ public class GUI {
         }
     }
 }
-
