@@ -83,8 +83,8 @@ public class GUI {
                     gameSessionParameters.get("rows").getAsInt(), gameSessionParameters.get("mines").getAsInt());
 
             mainWindow.setSize(iconWidth * gameSessionParameters.get("columns").getAsInt(),
-                    iconHeight * gameSessionParameters.get("rows").getAsInt() +
-                            MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
+                    iconHeight * gameSessionParameters.get("rows").getAsInt()
+                            + MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
 
             cardContainer.add(minefield, "minefield");
             cardLayout.show(cardContainer, "minefield");
@@ -159,8 +159,6 @@ public class GUI {
 
                                 JOptionPane.showMessageDialog(panel, "Game over!");
                                 cardLayout.show(cardContainer, "highScore");
-
-                                //TODO: запись high score в файл
                             }
 
                             reveal(cells, minefield, x, y, rows, columns);
