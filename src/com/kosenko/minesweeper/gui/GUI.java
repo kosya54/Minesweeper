@@ -1,16 +1,13 @@
 package com.kosenko.minesweeper.gui;
 
-import com.kosenko.minesweeper.controllers.MinefieldController;
+import com.google.gson.JsonObject;
+import com.kosenko.minesweeper.controllers.GameSessionController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
 
 public class GUI {
     private JFrame mainWindow;
@@ -30,8 +27,8 @@ public class GUI {
         iconWidth = Cell.getIconWidth();
         iconHeight = Cell.getIconHeight();
 
-        defaultWidth = iconWidth * MinefieldController.getDefaultColumns();
-        defaultHeight = iconHeight * MinefieldController.getDefaultRows();
+        defaultWidth = iconWidth * GameSessionController.getDefaultGridLength();
+        defaultHeight = iconHeight * GameSessionController.getDefaultGridLength();
 
         cardLayout = new CardLayout();
 
@@ -72,10 +69,22 @@ public class GUI {
             NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game", true);
             newGameDialog.setVisible(true);
 
-            Map<String, Integer> minefieldParameters = newGameDialog.getMinefieldParameters();
+            JsonObject gameSessionParameters = newGameDialog.getGameSessionParameters();
+            if (!gameSessionParameters.has("playerName")
+                    || !gameSessionParameters.has("columns")
+                    || !gameSessionParameters.has("rows")
+                    || !gameSessionParameters.has("mines")) {
+                cardLayout.show(cardContainer, "greetings");
 
-            JPanel minefield = getMinefield(minefieldParameters.get("columns"), minefieldParameters.get("rows"), minefieldParameters.get("countMines"));
-            mainWindow.setSize(iconWidth * minefieldParameters.get("columns"), iconHeight * minefieldParameters.get("rows") + MENU_HEIGHT + ICON_H_GAP * minefieldParameters.get("rows"));
+                return;
+            }
+
+            JPanel minefield = getMinefield(gameSessionParameters.get("columns").getAsInt(),
+                    gameSessionParameters.get("rows").getAsInt(), gameSessionParameters.get("mines").getAsInt());
+
+            mainWindow.setSize(iconWidth * gameSessionParameters.get("columns").getAsInt(),
+                    iconHeight * gameSessionParameters.get("rows").getAsInt() +
+                            MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
 
             cardContainer.add(minefield, "minefield");
             cardLayout.show(cardContainer, "minefield");
@@ -116,7 +125,7 @@ public class GUI {
         JPanel panel = new JPanel();
         panel.setLayout(layout);
 
-        int[][] minefield = MinefieldController.getMineField(columns, rows, countMines);
+        int[][] minefield = GameSessionController.getMineField(columns, rows, countMines);
         temporaryShowMinefieldArray(minefield);
 
         Cell[][] cells = new Cell[rows][columns];
@@ -143,7 +152,7 @@ public class GUI {
                             int x = cell.getPositionX();
                             int y = cell.getPositionY();
 
-                            if (minefield[y][x] == MinefieldController.getMineValue()) {
+                            if (minefield[y][x] == GameSessionController.getMineValue()) {
                                 cell.setMine();
 
                                 //TODO: Функцию проигрыша
@@ -186,7 +195,7 @@ public class GUI {
             return;
         }
 
-        if (minefield[y][x] == MinefieldController.getMineValue()) {
+        if (minefield[y][x] == GameSessionController.getMineValue()) {
             return;
         }
 
@@ -220,115 +229,6 @@ public class GUI {
     private void temporaryShowMinefieldArray(int[][] minefield) {
         for (int[] array : minefield) {
             System.out.println(Arrays.toString(array));
-        }
-    }
-
-    private static class NewGameDialog extends JDialog implements ActionListener {
-        private JTextField playerName;
-        private JTextField columns;
-        private JTextField rows;
-        private JTextField countMine;
-
-        private JButton ok;
-        private JButton cancel;
-
-        private Map<String, Integer> minefieldParameters;
-
-        public NewGameDialog(JFrame parent, String name, boolean modal) {
-            super(parent, name, modal);
-
-            setLayout(new GridBagLayout());
-            setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-            JLabel nameLabel = new JLabel("Введите ваше имя:", JLabel.LEFT);
-            JLabel columnsLabel = new JLabel("Укажите ширину поля:", JLabel.LEFT);
-            JLabel rowsLabel = new JLabel("Укажите высоту поля:", JLabel.LEFT);
-            JLabel countMineLabel = new JLabel("Укажите колличество мин на поле:", JLabel.LEFT);
-
-            playerName = new JTextField();
-            columns = new JTextField();
-            rows = new JTextField();
-            countMine = new JTextField();
-
-            minefieldParameters = new HashMap<>();
-
-            ok = new JButton("ok");
-            ok.addActionListener(this);
-
-            cancel = new JButton("cancel");
-            cancel.addActionListener(this);
-
-            GridBagConstraints constraints = getConstraints();
-
-            add(nameLabel, constraints);
-            add(playerName, constraints);
-
-            add(columnsLabel, constraints);
-            add(columns, constraints);
-
-            add(rowsLabel, constraints);
-            add(rows, constraints);
-
-            add(countMineLabel, constraints);
-            add(countMine, constraints);
-            
-            constraints.gridwidth = 1;
-            add(ok, constraints);
-
-            constraints.gridwidth = 1;
-            constraints.gridx = 1;
-            add(cancel, constraints);
-
-            pack();
-            setLocationRelativeTo(null);
-        }
-
-        private GridBagConstraints getConstraints() {
-            GridBagConstraints constraints = new GridBagConstraints();
-
-            constraints.anchor = GridBagConstraints.WEST;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.insets = new Insets(5, 5, 5, 5);
-            constraints.gridx = 0;
-            constraints.gridy = GridBagConstraints.RELATIVE;
-            constraints.ipadx = 0;
-            constraints.ipady = 0;
-            constraints.gridwidth = 2;
-            constraints.gridheight = 1;
-            constraints.weightx = 0.1;
-            constraints.weighty = 0.1;
-
-            return constraints;
-        }
-
-        public Map<String, Integer> getMinefieldParameters() {
-            return minefieldParameters;
-        }
-
-        private void setMinefieldParameters(String key, String value) {
-            if (value.equals("")) {
-                minefieldParameters.put(key, MinefieldController.getDefaultColumns());
-            } else if (MinefieldController.isNumber(value)) {
-                minefieldParameters.put(key, MinefieldController.getInt(value));
-            } else {
-                JOptionPane.showMessageDialog(this, "Введите число.");
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == ok) {
-                setMinefieldParameters("playerName", playerName.getText());
-                setMinefieldParameters("columns", columns.getText());
-                setMinefieldParameters("rows", rows.getText());
-                setMinefieldParameters("countMines", countMine.getText());
-
-                dispose();
-            }
-
-            if (e.getSource() == cancel) {
-                dispose();
-            }
         }
     }
 }
