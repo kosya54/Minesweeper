@@ -229,11 +229,6 @@ public class GUI {
         private JTextField rows;
         private JTextField countMine;
 
-        private JLabel nameLabel;
-        private JLabel columnsLabel;
-        private JLabel rowsLabel;
-        private JLabel countMineLabel;
-
         private JButton ok;
         private JButton cancel;
 
@@ -245,10 +240,10 @@ public class GUI {
             setLayout(new GridBagLayout());
             setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-            nameLabel = new JLabel("Введите ваше имя:", JLabel.LEFT);
-            columnsLabel = new JLabel("Укажите ширину поля:", JLabel.LEFT);
-            rowsLabel = new JLabel("Укажите высоту поля:", JLabel.LEFT);
-            countMineLabel = new JLabel("Укажите колличество мин на поле:", JLabel.LEFT);
+            JLabel nameLabel = new JLabel("Введите ваше имя:", JLabel.LEFT);
+            JLabel columnsLabel = new JLabel("Укажите ширину поля:", JLabel.LEFT);
+            JLabel rowsLabel = new JLabel("Укажите высоту поля:", JLabel.LEFT);
+            JLabel countMineLabel = new JLabel("Укажите колличество мин на поле:", JLabel.LEFT);
 
             playerName = new JTextField();
             columns = new JTextField();
