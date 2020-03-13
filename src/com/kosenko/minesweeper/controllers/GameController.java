@@ -1,26 +1,26 @@
 package com.kosenko.minesweeper.controllers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import com.kosenko.minesweeper.models.Minefield;
-import com.kosenko.minesweeper.gui.Cell;
+import com.kosenko.minesweeper.models.Cell;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.io.File;
-import java.io.IOException;
 
 import com.google.gson.JsonObject;
 
-public class GameSessionController {
+public class GameController {
     private final static int DEFAULT_GRID_LENGTH = 9;
     private final static int DEFAULT_COUNT_MINES = 10;
     private final static int MAX_GRID_LENGTH = 25;
-    private final static int MAX_COUNT_MINES = 300;
-    
-//    private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
-    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
+
+    private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
+//    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
+    private final static String FILE_NAME = "HighScore";
     private final static String FILE_EXTENSION = ".sav";
+
+    private final static File FILE = new File(SAVES_PATH, FILE_NAME + FILE_EXTENSION);
 
     public static int getDefaultGridLength() {
         return DEFAULT_GRID_LENGTH;
@@ -34,10 +34,6 @@ public class GameSessionController {
         return MAX_GRID_LENGTH;
     }
 
-    public static int getMaxCountMines() {
-        return MAX_COUNT_MINES;
-    }
-
     public static int getMineValue() {
         return Minefield.getMine();
     }
@@ -48,10 +44,6 @@ public class GameSessionController {
 
     public static boolean isCorrectGridLength(int gridLength) {
         return gridLength < DEFAULT_GRID_LENGTH || gridLength > MAX_GRID_LENGTH;
-    }
-
-    public static boolean isCorrectCountMines(int countMines) {
-        return countMines >= DEFAULT_COUNT_MINES && countMines <= MAX_COUNT_MINES;
     }
 
     public static boolean isEmpty(String playerName) {
@@ -93,7 +85,7 @@ public class GameSessionController {
 
     public static boolean isWon(JsonObject gameSessionParameters, Cell[][] cells) {
         int totalCells = gameSessionParameters.get("columns").getAsInt() * gameSessionParameters.get("rows").getAsInt();
-        int countOpened = GameSessionController.getCountOpenedCells(cells);
+        int countOpened = GameController.getCountOpenedCells(cells);
         int mines = gameSessionParameters.get("mines").getAsInt();
 
         return totalCells - countOpened == mines;
@@ -103,10 +95,24 @@ public class GameSessionController {
         return value == getMineValue();
     }
 
-    public static void writeHighscore(JsonObject gameSession) throws IOException {
-        File file = new File(SAVES_PATH, "Highscore" + FILE_EXTENSION);
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8))) {
+//TODO: Переделать на не статик методы, запускать из actionListenera меню
+
+    public static void writeHighScore(JsonObject gameSession) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(FILE, true), StandardCharsets.UTF_8))) {
             writer.write(gameSession.toString());
+            writer.append(System.lineSeparator());
         }
+    }
+
+    public static JsonArray readHighScore() throws IOException {
+        JsonArray highScoreArray = new JsonArray();
+        try (FileReader fileReader = new FileReader(FILE); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                highScoreArray.add(new JsonParser().parse(line).getAsJsonObject());
+            }
+        }
+
+        return highScoreArray;
     }
 }

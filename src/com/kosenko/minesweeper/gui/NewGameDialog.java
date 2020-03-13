@@ -1,7 +1,7 @@
 package com.kosenko.minesweeper.gui;
 
 import com.google.gson.JsonObject;
-import com.kosenko.minesweeper.controllers.GameSessionController;
+import com.kosenko.minesweeper.controllers.GameController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,7 @@ class NewGameDialog extends JDialog implements ActionListener {
     private JButton ok;
     private JButton cancel;
 
-    private JsonObject gameSessionParameters;
+    private JsonObject gameParameters;
 
     public NewGameDialog(JFrame parent, String name, boolean modal) {
         super(parent, name, modal);
@@ -35,7 +35,7 @@ class NewGameDialog extends JDialog implements ActionListener {
         rows = new JTextField();
         mines = new JTextField();
 
-        gameSessionParameters = new JsonObject();
+        gameParameters = new JsonObject();
 
         ok = new JButton("ok");
         ok.addActionListener(this);
@@ -86,93 +86,95 @@ class NewGameDialog extends JDialog implements ActionListener {
         return constraints;
     }
 
-    public JsonObject getGameSessionParameters() {
-        return gameSessionParameters;
+    public JsonObject getGameParameters() {
+        return gameParameters;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ok) {
-            if (GameSessionController.isEmpty(playerName.getText())) {
+            if (GameController.isEmpty(playerName.getText())) {
                 JOptionPane.showMessageDialog(this, "Укажите имя.");
 
                 return;
             }
 
-            if (!GameSessionController.isCorrectLength(playerName.getText())) {
+            if (!GameController.isCorrectLength(playerName.getText())) {
                 JOptionPane.showMessageDialog(this, "Имя должно быть > 3 и < 20 символов.");
 
                 return;
             }
 
-            gameSessionParameters.addProperty("playerName", playerName.getText());
+            gameParameters.addProperty("playerName", playerName.getText());
 
-            if (GameSessionController.isEmpty(columns.getText())) {
-                gameSessionParameters.addProperty("columns", GameSessionController.getDefaultGridLength());
+            int columnsValue = 0;
+            if (GameController.isEmpty(columns.getText())) {
+                gameParameters.addProperty("columns", GameController.getDefaultGridLength());
             } else {
-                if (GameSessionController.isNumber(columns.getText())) {
+                if (GameController.isNumber(columns.getText())) {
                     JOptionPane.showMessageDialog(this, "Введите число.");
 
                     return;
                 }
 
-                int columnsValue = GameSessionController.getInt(columns.getText());
-                if (GameSessionController.isCorrectGridLength(columnsValue)) {
+                columnsValue = GameController.getInt(columns.getText());
+                if (GameController.isCorrectGridLength(columnsValue)) {
                     String message = String.format("Длина поля должна быть > %d и < %d",
-                            GameSessionController.getDefaultGridLength(), GameSessionController.getMaxGridLength());
+                            GameController.getDefaultGridLength(), GameController.getMaxGridLength());
 
                     JOptionPane.showMessageDialog(this, message);
 
                     return;
                 }
 
-                gameSessionParameters.addProperty("columns", columnsValue);
+                gameParameters.addProperty("columns", columnsValue);
             }
 
-            if (GameSessionController.isEmpty(rows.getText())) {
-                gameSessionParameters.addProperty("rows", GameSessionController.getDefaultGridLength());
+            int rowsValue = 0;
+            if (GameController.isEmpty(rows.getText())) {
+                gameParameters.addProperty("rows", GameController.getDefaultGridLength());
             } else {
-                if (GameSessionController.isNumber(rows.getText())) {
+                if (GameController.isNumber(rows.getText())) {
                     JOptionPane.showMessageDialog(this, "Введите число.");
 
                     return;
                 }
 
-                int rowsValue = GameSessionController.getInt(rows.getText());
-                if (GameSessionController.isCorrectGridLength(rowsValue)) {
+                rowsValue = GameController.getInt(rows.getText());
+                if (GameController.isCorrectGridLength(rowsValue)) {
                     String message = String.format("Длина поля должна быть > %d и < %d",
-                            GameSessionController.getDefaultGridLength(), GameSessionController.getMaxGridLength());
+                            GameController.getDefaultGridLength(), GameController.getMaxGridLength());
 
                     JOptionPane.showMessageDialog(this, message);
 
                     return;
                 }
 
-                gameSessionParameters.addProperty("rows", rowsValue);
+                gameParameters.addProperty("rows", rowsValue);
             }
 
             //TODO: Сделать проверку колличества бомб в зависимости от ширины поля!
 
-            if (GameSessionController.isEmpty(mines.getText())) {
-                gameSessionParameters.addProperty("mines", GameSessionController.getDefaultCountMines());
+            if (GameController.isEmpty(mines.getText())) {
+                gameParameters.addProperty("mines", GameController.getDefaultCountMines());
             } else {
-                if (GameSessionController.isNumber(mines.getText())) {
+                if (GameController.isNumber(mines.getText())) {
                     JOptionPane.showMessageDialog(this, "Введите число.");
 
                     return;
                 }
 
-                int minesValue = GameSessionController.getInt(mines.getText());
-                if (!GameSessionController.isCorrectCountMines(minesValue)) {
+                int minesValue = GameController.getInt(mines.getText());
+                if (minesValue > (columnsValue * rowsValue) || minesValue < GameController.getDefaultCountMines()) {
                     String message = String.format("Колличество мин должно быть > %d и < %d",
-                            GameSessionController.getDefaultCountMines(), GameSessionController.getMaxCountMines());
+                            GameController.getDefaultCountMines(), columnsValue * rowsValue);
 
                     JOptionPane.showMessageDialog(this, message);
 
                     return;
                 }
 
-                gameSessionParameters.addProperty("mines", minesValue);
+                gameParameters.addProperty("mines", minesValue);
             }
 
             dispose();

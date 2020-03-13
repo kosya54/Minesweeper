@@ -1,7 +1,8 @@
 package com.kosenko.minesweeper.gui;
 
 import com.google.gson.JsonObject;
-import com.kosenko.minesweeper.controllers.GameSessionController;
+import com.kosenko.minesweeper.controllers.GameController;
+import com.kosenko.minesweeper.models.Cell;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,8 +29,8 @@ public class GUI {
         iconWidth = Cell.getIconWidth();
         iconHeight = Cell.getIconHeight();
 
-        defaultWidth = iconWidth * GameSessionController.getDefaultGridLength();
-        defaultHeight = iconHeight * GameSessionController.getDefaultGridLength();
+        defaultWidth = iconWidth * GameController.getDefaultGridLength();
+        defaultHeight = iconHeight * GameController.getDefaultGridLength();
 
         cardLayout = new CardLayout();
 
@@ -40,7 +41,7 @@ public class GUI {
         cardContainer.add(getHighScorePanel(), "highScore");
 
         mainWindow = new JFrame("Minesweeper");
-        mainWindow.setSize(defaultWidth, defaultHeight + MENU_HEIGHT);
+        setDefaultSize();
         mainWindow.setResizable(false);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.setJMenuBar(getMainMenu());
@@ -66,6 +67,10 @@ public class GUI {
                     + MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
     }
 
+    private void setDefaultSize() {
+        mainWindow.setSize(defaultWidth, defaultHeight + MENU_HEIGHT);
+    }
+
     private JMenuBar getMainMenu() {
         JMenu file = new JMenu("File");
 
@@ -76,7 +81,7 @@ public class GUI {
             NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game", true);
             newGameDialog.setVisible(true);
 
-            JsonObject gameSessionParameters = newGameDialog.getGameSessionParameters();
+            JsonObject gameSessionParameters = newGameDialog.getGameParameters();
             if (!gameSessionParameters.has("playerName")
                     || !gameSessionParameters.has("columns")
                     || !gameSessionParameters.has("rows")
@@ -95,6 +100,11 @@ public class GUI {
 
         JMenuItem highScore = new JMenuItem("High score");
         file.add(highScore);
+
+        highScore.addActionListener(e -> {
+            setDefaultSize();
+            cardLayout.show(cardContainer, "highScore");
+        });
 
         JMenuItem about = new JMenuItem("About");
         file.add(about);
@@ -124,23 +134,30 @@ public class GUI {
     }
 
     private JPanel getHighScorePanel() {
-        JLabel highscore = new JLabel("Highscore panel", JLabel.CENTER);
-        
+
+        JLabel highScore = new JLabel("HighScore panel", JLabel.CENTER);
+
         JPanel panel = new JPanel();
-        panel.add(highscore);
+        panel.add(highScore);
+
+        try {
+            System.out.println(GameController.readHighScore().toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         return panel;
     }
 
-    private JPanel getMinefield(JsonObject gameSessionParameters) {
-        int columns = gameSessionParameters.get("columns").getAsInt();
-        int rows = gameSessionParameters.get("rows").getAsInt();
-        int countMines = gameSessionParameters.get("mines").getAsInt();
+    private JPanel getMinefield(JsonObject gameParameters) {
+        int columns = gameParameters.get("columns").getAsInt();
+        int rows = gameParameters.get("rows").getAsInt();
+        int countMines = gameParameters.get("mines").getAsInt();
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP));
 
-        int[][] minefield = GameSessionController.getMineField(columns, rows, countMines);
+        int[][] minefield = GameController.getMineField(columns, rows, countMines);
         temporaryShowMinefieldArray(minefield);
 
         Cell[][] cells = new Cell[rows][columns];
@@ -164,10 +181,12 @@ public class GUI {
                             int x = cell.getPositionX();
                             int y = cell.getPositionY();
 
-                            if (GameSessionController.isLose(minefield[y][x])) {
+                            if (GameController.isLose(minefield[y][x])) {
                                 cell.setMine();
 
                                 JOptionPane.showMessageDialog(panel, "Game over!");
+
+//                                setDefaultSize();
                                 cardLayout.show(cardContainer, "highScore");
                             }
 
@@ -184,16 +203,17 @@ public class GUI {
                             }
                         }
 
-                        if (GameSessionController.isWon(gameSessionParameters, cells)) {
+                        if (GameController.isWon(gameParameters, cells)) {
                             JOptionPane.showMessageDialog(panel, "You are win!");
 
                             try {
-                                GameSessionController.writeHighscore(gameSessionParameters);
+                                GameController.writeHighScore(gameParameters);
                             } catch (IOException ex) {
                                 JOptionPane.showMessageDialog(panel, ex.getMessage());
                                 ex.printStackTrace();
                             }
-                            
+
+//                            setDefaultSize();
                             cardLayout.show(cardContainer, "highScore");
                         }
                     }
@@ -216,7 +236,7 @@ public class GUI {
             return;
         }
 
-        if (minefield[y][x] == GameSessionController.getMineValue()) {
+        if (minefield[y][x] == GameController.getMineValue()) {
             return;
         }
 
