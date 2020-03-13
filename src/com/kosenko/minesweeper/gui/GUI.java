@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class GUI {
@@ -59,6 +60,12 @@ public class GUI {
         });
     }
 
+    private void resizeFrame(JsonObject gameSessionParameters) {
+        mainWindow.setSize(iconWidth * gameSessionParameters.get("columns").getAsInt(),
+                    iconHeight * gameSessionParameters.get("rows").getAsInt()
+                    + MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
+    }
+
     private JMenuBar getMainMenu() {
         JMenu file = new JMenu("File");
 
@@ -79,12 +86,8 @@ public class GUI {
                 return;
             }
 
-            JPanel minefield = getMinefield(gameSessionParameters.get("columns").getAsInt(),
-                    gameSessionParameters.get("rows").getAsInt(), gameSessionParameters.get("mines").getAsInt());
-
-            mainWindow.setSize(iconWidth * gameSessionParameters.get("columns").getAsInt(),
-                    iconHeight * gameSessionParameters.get("rows").getAsInt()
-                            + MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
+            JPanel minefield = getMinefield(gameSessionParameters);
+            resizeFrame(gameSessionParameters);
 
             cardContainer.add(minefield, "minefield");
             cardLayout.show(cardContainer, "minefield");
@@ -112,18 +115,30 @@ public class GUI {
     }
 
     private JPanel getGreetingsPanel() {
-        return new JPanel();
+        JLabel greetings = new JLabel("Greetings panel", JLabel.CENTER);
+        
+        JPanel panel = new JPanel();
+        panel.add(greetings);
+
+        return panel;
     }
 
     private JPanel getHighScorePanel() {
-        return new JPanel();
+        JLabel highscore = new JLabel("Highscore panel", JLabel.CENTER);
+        
+        JPanel panel = new JPanel();
+        panel.add(highscore);
+
+        return panel;
     }
 
-    private JPanel getMinefield(int columns, int rows, int countMines) {
-        GridLayout layout = new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP);
+    private JPanel getMinefield(JsonObject gameSessionParameters) {
+        int columns = gameSessionParameters.get("columns").getAsInt();
+        int rows = gameSessionParameters.get("rows").getAsInt();
+        int countMines = gameSessionParameters.get("mines").getAsInt();
 
         JPanel panel = new JPanel();
-        panel.setLayout(layout);
+        panel.setLayout(new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP));
 
         int[][] minefield = GameSessionController.getMineField(columns, rows, countMines);
         temporaryShowMinefieldArray(minefield);
@@ -132,7 +147,6 @@ public class GUI {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 Cell cell = new Cell();
-
                 cell.setTile();
                 cell.setPositionX(j);
                 cell.setPositionY(i);
@@ -142,8 +156,6 @@ public class GUI {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
 
-                        //TODO: Счетчик открытых бомб и функцию выигрыша
-
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             if (cell.isFlagged()) {
                                 cell.setFlagged(false);
@@ -152,10 +164,8 @@ public class GUI {
                             int x = cell.getPositionX();
                             int y = cell.getPositionY();
 
-                            if (minefield[y][x] == GameSessionController.getMineValue()) {
+                            if (GameSessionController.isLose(minefield[y][x])) {
                                 cell.setMine();
-
-                                //TODO: Функцию проигрыша
 
                                 JOptionPane.showMessageDialog(panel, "Game over!");
                                 cardLayout.show(cardContainer, "highScore");
@@ -172,6 +182,19 @@ public class GUI {
                                 cell.setFlagged(false);
                                 cell.setTile();
                             }
+                        }
+
+                        if (GameSessionController.isWon(gameSessionParameters, cells)) {
+                            JOptionPane.showMessageDialog(panel, "You are win!");
+
+                            try {
+                                GameSessionController.writeHighscore(gameSessionParameters);
+                            } catch (IOException ex) {
+                                JOptionPane.showMessageDialog(panel, ex.getMessage());
+                                ex.printStackTrace();
+                            }
+                            
+                            cardLayout.show(cardContainer, "highScore");
                         }
                     }
                 });
@@ -207,6 +230,7 @@ public class GUI {
 
         if (minefield[y][x] > 0) {
             cells[y][x].setNumber(minefield[y][x]);
+            cells[y][x].setOpened();
 
             return;
         }
@@ -225,6 +249,7 @@ public class GUI {
     }
 
     private void temporaryShowMinefieldArray(int[][] minefield) {
+        System.out.println("New game started!");
         for (int[] array : minefield) {
             System.out.println(Arrays.toString(array));
         }
