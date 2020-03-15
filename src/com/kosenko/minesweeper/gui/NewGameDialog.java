@@ -153,8 +153,6 @@ class NewGameDialog extends JDialog implements ActionListener {
                 gameParameters.addProperty("rows", rowsValue);
             }
 
-            //TODO: Сделать проверку колличества бомб в зависимости от ширины поля!
-
             if (GameController.isEmpty(mines.getText())) {
                 gameParameters.addProperty("mines", GameController.getDefaultCountMines());
             } else {

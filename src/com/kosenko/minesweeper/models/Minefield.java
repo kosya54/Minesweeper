@@ -32,7 +32,8 @@ public class Minefield {
 
     private int[][] generateMinesInField() {
         Random random = new Random();
-        int[][] minefield = generateEmptyMinefield();
+//        int[][] minefield = generateEmptyMinefield();
+        int[][] minefield = new int[rows][columns];
 
         int count = 0;
         while (count != countMines) {

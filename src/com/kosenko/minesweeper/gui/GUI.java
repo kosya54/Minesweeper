@@ -1,5 +1,7 @@
 package com.kosenko.minesweeper.gui;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.kosenko.minesweeper.controllers.GameController;
 import com.kosenko.minesweeper.models.Cell;
@@ -16,6 +18,8 @@ public class GUI {
     private JPanel cardContainer;
     private CardLayout cardLayout;
 
+    private GameController gameController;
+
     private final static int ICON_V_GAP = 0;
     private final static int ICON_H_GAP = 0;
     private final static int MENU_HEIGHT = 30;
@@ -26,6 +30,8 @@ public class GUI {
     private int defaultHeight;
 
     public GUI() {
+        gameController = new GameController();
+
         iconWidth = Cell.getIconWidth();
         iconHeight = Cell.getIconHeight();
 
@@ -41,7 +47,8 @@ public class GUI {
         cardContainer.add(getHighScorePanel(), "highScore");
 
         mainWindow = new JFrame("Minesweeper");
-        setDefaultSize();
+        setDefaultFrameSize();
+
         mainWindow.setResizable(false);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.setJMenuBar(getMainMenu());
@@ -63,11 +70,11 @@ public class GUI {
 
     private void resizeFrame(JsonObject gameSessionParameters) {
         mainWindow.setSize(iconWidth * gameSessionParameters.get("columns").getAsInt(),
-                    iconHeight * gameSessionParameters.get("rows").getAsInt()
-                    + MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
+                iconHeight * gameSessionParameters.get("rows").getAsInt()
+                        + MENU_HEIGHT + ICON_H_GAP * gameSessionParameters.get("rows").getAsInt());
     }
 
-    private void setDefaultSize() {
+    private void setDefaultFrameSize() {
         mainWindow.setSize(defaultWidth, defaultHeight + MENU_HEIGHT);
     }
 
@@ -102,7 +109,7 @@ public class GUI {
         file.add(highScore);
 
         highScore.addActionListener(e -> {
-            setDefaultSize();
+            setDefaultFrameSize();
             cardLayout.show(cardContainer, "highScore");
         });
 
@@ -126,7 +133,7 @@ public class GUI {
 
     private JPanel getGreetingsPanel() {
         JLabel greetings = new JLabel("Greetings panel", JLabel.CENTER);
-        
+
         JPanel panel = new JPanel();
         panel.add(greetings);
 
@@ -134,17 +141,9 @@ public class GUI {
     }
 
     private JPanel getHighScorePanel() {
-
-        JLabel highScore = new JLabel("HighScore panel", JLabel.CENTER);
-
         JPanel panel = new JPanel();
-        panel.add(highScore);
-
-        try {
-            System.out.println(GameController.readHighScore().toString());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        panel.setBorder(BorderFactory.createTitledBorder("High score"));
+//        panel.add(highScore);
 
         return panel;
     }
@@ -186,7 +185,7 @@ public class GUI {
 
                                 JOptionPane.showMessageDialog(panel, "Game over!");
 
-//                                setDefaultSize();
+                                setDefaultFrameSize();
                                 cardLayout.show(cardContainer, "highScore");
                             }
 
@@ -207,13 +206,13 @@ public class GUI {
                             JOptionPane.showMessageDialog(panel, "You are win!");
 
                             try {
-                                GameController.writeHighScore(gameParameters);
+                                gameController.writeHighScore(gameParameters);
                             } catch (IOException ex) {
                                 JOptionPane.showMessageDialog(panel, ex.getMessage());
                                 ex.printStackTrace();
                             }
 
-//                            setDefaultSize();
+                            setDefaultFrameSize();
                             cardLayout.show(cardContainer, "highScore");
                         }
                     }

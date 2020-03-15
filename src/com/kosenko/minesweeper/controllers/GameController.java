@@ -20,7 +20,11 @@ public class GameController {
     private final static String FILE_NAME = "HighScore";
     private final static String FILE_EXTENSION = ".sav";
 
-    private final static File FILE = new File(SAVES_PATH, FILE_NAME + FILE_EXTENSION);
+    private File file;
+
+    public GameController() {
+        file = new File(SAVES_PATH, FILE_NAME + FILE_EXTENSION);
+    }
 
     public static int getDefaultGridLength() {
         return DEFAULT_GRID_LENGTH;
@@ -95,22 +99,22 @@ public class GameController {
         return value == getMineValue();
     }
 
-//TODO: Переделать на не статик методы, запускать из actionListenera меню
-
-    public static void writeHighScore(JsonObject gameSession) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(FILE, true), StandardCharsets.UTF_8))) {
+    public void writeHighScore(JsonObject gameSession) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8))) {
             writer.write(gameSession.toString());
             writer.append(System.lineSeparator());
         }
     }
 
-    public static JsonArray readHighScore() throws IOException {
+    public JsonArray readHighScore() {
         JsonArray highScoreArray = new JsonArray();
-        try (FileReader fileReader = new FileReader(FILE); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+        try (FileReader fileReader = new FileReader(file); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 highScoreArray.add(new JsonParser().parse(line).getAsJsonObject());
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return highScoreArray;
