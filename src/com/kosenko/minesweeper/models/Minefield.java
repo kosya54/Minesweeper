@@ -19,20 +19,8 @@ public class Minefield {
         return MINE;
     }
 
-    private int[][] generateEmptyMinefield() {
-        int[][] minefield = new int[rows][columns];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                minefield[i][j] = 0;
-            }
-        }
-        return minefield;
-    }
-
     private int[][] generateMinesInField() {
         Random random = new Random();
-//        int[][] minefield = generateEmptyMinefield();
         int[][] minefield = new int[rows][columns];
 
         int count = 0;

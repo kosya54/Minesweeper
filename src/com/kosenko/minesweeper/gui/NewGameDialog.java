@@ -2,20 +2,17 @@ package com.kosenko.minesweeper.gui;
 
 import com.google.gson.JsonObject;
 import com.kosenko.minesweeper.controllers.GameController;
+import com.kosenko.minesweeper.controllers.verifiers.GridVerifier;
+import com.kosenko.minesweeper.controllers.verifiers.PlayerNameVerifier;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-class NewGameDialog extends JDialog implements ActionListener {
+class NewGameDialog extends JDialog {
     private JTextField playerName;
     private JTextField columns;
     private JTextField rows;
     private JTextField mines;
-
-    private JButton ok;
-    private JButton cancel;
 
     private JsonObject gameParameters;
 
@@ -25,27 +22,34 @@ class NewGameDialog extends JDialog implements ActionListener {
         setLayout(new GridBagLayout());
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        JLabel nameLabel = new JLabel("Введите ваше имя:", JLabel.LEFT);
-        JLabel columnsLabel = new JLabel("Укажите ширину поля:", JLabel.LEFT);
-        JLabel rowsLabel = new JLabel("Укажите высоту поля:", JLabel.LEFT);
-        JLabel minesLabel = new JLabel("Укажите колличество мин на поле:", JLabel.LEFT);
+        JLabel playerNameLabel = new JLabel("Введите ваше имя:", JLabel.LEFT);
+        playerName = getPlayerNameField();
 
-        playerName = new JTextField();
-        columns = new JTextField();
-        rows = new JTextField();
-        mines = new JTextField();
+        GridVerifier gridVerifier = new GridVerifier(GameController.getDefaultGridLength(),
+                GameController.getMaxGridLength());
+        String defaultGridLength = Integer.toString(GameController.getDefaultGridLength());
+
+        JLabel columnsLabel = new JLabel("Ширина поля:", JLabel.LEFT);
+        columns = getGridField(gridVerifier, defaultGridLength);
+
+        JLabel rowsLabel = new JLabel("Высота поля:", JLabel.LEFT);
+        rows = getGridField(gridVerifier, defaultGridLength);
+
+        JLabel minesLabel = new JLabel("Колличество мин на поле:", JLabel.LEFT);
+
+        GridVerifier minesVerifier = new GridVerifier(GameController.getDefaultCountMines(),
+                (int) Math.pow(GameController.getDefaultGridLength(), 2));
+        String defaultCountMines = Integer.toString(GameController.getDefaultCountMines());
+        mines = getGridField(minesVerifier, defaultCountMines);
+
+        JButton ok = getButtonOk();
+        JButton cancel = getButtonCancel();
 
         gameParameters = new JsonObject();
 
-        ok = new JButton("ok");
-        ok.addActionListener(this);
-
-        cancel = new JButton("cancel");
-        cancel.addActionListener(this);
-
         GridBagConstraints constraints = getConstraints();
 
-        add(nameLabel, constraints);
+        add(playerNameLabel, constraints);
         add(playerName, constraints);
 
         add(columnsLabel, constraints);
@@ -68,6 +72,76 @@ class NewGameDialog extends JDialog implements ActionListener {
         setLocationRelativeTo(null);
     }
 
+    private JButton getButtonOk() {
+        JButton ok = new JButton("Ok");
+        ok.setVerifyInputWhenFocusTarget(true);
+        ok.addActionListener(e -> {
+            if (!playerName.getInputVerifier().verify(playerName)) {
+                JOptionPane.showMessageDialog(playerName.getParent(), "Имя должно быть от 3 до 10 символов");
+
+                return;
+            }
+
+            gameParameters.addProperty("playerName", playerName.getText());
+
+            if (!columns.getInputVerifier().verify(columns) || !rows.getInputVerifier().verify(rows)) {
+                String message = String.format("Длина поля должна быть от %d до %d",
+                        GameController.getDefaultGridLength(), GameController.getMaxGridLength());
+
+                JOptionPane.showMessageDialog(columns.getParent(), message);
+
+                return;
+            }
+
+            int columnsValue = Integer.parseInt(columns.getText());
+            gameParameters.addProperty("columns", columnsValue);
+
+            int rowsValue = Integer.parseInt(rows.getText());
+            gameParameters.addProperty("rows", rowsValue);
+
+            GridVerifier minesVerifier = (GridVerifier) mines.getInputVerifier();
+            minesVerifier.setMax(columnsValue * rowsValue);
+            if (!mines.getInputVerifier().verify(mines)) {
+                String message = String.format("Колличество мин должно быть от %d до %d",
+                        GameController.getDefaultCountMines(), columnsValue * rowsValue);
+
+                JOptionPane.showMessageDialog(mines.getParent(), message);
+            }
+
+            int minesValue = Integer.parseInt(mines.getText());
+            gameParameters.addProperty("mines", minesValue);
+
+            dispose();
+        });
+
+        return ok;
+    }
+
+    private JButton getButtonCancel() {
+        JButton cancel = new JButton("Cancel");
+        cancel.setVerifyInputWhenFocusTarget(false);
+        cancel.addActionListener(e -> dispose());
+
+        return cancel;
+    }
+
+    private JTextField getPlayerNameField() {
+        JTextField playerName = new JTextField();
+        playerName.setHorizontalAlignment(JTextField.CENTER);
+        playerName.setInputVerifier(new PlayerNameVerifier());
+
+        return playerName;
+    }
+
+    private JTextField getGridField(GridVerifier verifier, String defaultValue) {
+        JTextField grid = new JTextField();
+        grid.setText(defaultValue);
+        grid.setInputVerifier(verifier);
+        grid.setHorizontalAlignment(JTextField.CENTER);
+
+        return grid;
+    }
+
     private GridBagConstraints getConstraints() {
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -88,98 +162,5 @@ class NewGameDialog extends JDialog implements ActionListener {
 
     public JsonObject getGameParameters() {
         return gameParameters;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == ok) {
-            if (GameController.isEmpty(playerName.getText())) {
-                JOptionPane.showMessageDialog(this, "Укажите имя.");
-
-                return;
-            }
-
-            if (!GameController.isCorrectLength(playerName.getText())) {
-                JOptionPane.showMessageDialog(this, "Имя должно быть > 3 и < 20 символов.");
-
-                return;
-            }
-
-            gameParameters.addProperty("playerName", playerName.getText());
-
-            int columnsValue = 0;
-            if (GameController.isEmpty(columns.getText())) {
-                gameParameters.addProperty("columns", GameController.getDefaultGridLength());
-            } else {
-                if (GameController.isNumber(columns.getText())) {
-                    JOptionPane.showMessageDialog(this, "Введите число.");
-
-                    return;
-                }
-
-                columnsValue = GameController.getInt(columns.getText());
-                if (GameController.isCorrectGridLength(columnsValue)) {
-                    String message = String.format("Длина поля должна быть > %d и < %d",
-                            GameController.getDefaultGridLength(), GameController.getMaxGridLength());
-
-                    JOptionPane.showMessageDialog(this, message);
-
-                    return;
-                }
-
-                gameParameters.addProperty("columns", columnsValue);
-            }
-
-            int rowsValue = 0;
-            if (GameController.isEmpty(rows.getText())) {
-                gameParameters.addProperty("rows", GameController.getDefaultGridLength());
-            } else {
-                if (GameController.isNumber(rows.getText())) {
-                    JOptionPane.showMessageDialog(this, "Введите число.");
-
-                    return;
-                }
-
-                rowsValue = GameController.getInt(rows.getText());
-                if (GameController.isCorrectGridLength(rowsValue)) {
-                    String message = String.format("Длина поля должна быть > %d и < %d",
-                            GameController.getDefaultGridLength(), GameController.getMaxGridLength());
-
-                    JOptionPane.showMessageDialog(this, message);
-
-                    return;
-                }
-
-                gameParameters.addProperty("rows", rowsValue);
-            }
-
-            if (GameController.isEmpty(mines.getText())) {
-                gameParameters.addProperty("mines", GameController.getDefaultCountMines());
-            } else {
-                if (GameController.isNumber(mines.getText())) {
-                    JOptionPane.showMessageDialog(this, "Введите число.");
-
-                    return;
-                }
-
-                int minesValue = GameController.getInt(mines.getText());
-                if (minesValue > (columnsValue * rowsValue) || minesValue < GameController.getDefaultCountMines()) {
-                    String message = String.format("Колличество мин должно быть > %d и < %d",
-                            GameController.getDefaultCountMines(), columnsValue * rowsValue);
-
-                    JOptionPane.showMessageDialog(this, message);
-
-                    return;
-                }
-
-                gameParameters.addProperty("mines", minesValue);
-            }
-
-            dispose();
-        }
-
-        if (e.getSource() == cancel) {
-            dispose();
-        }
     }
 }

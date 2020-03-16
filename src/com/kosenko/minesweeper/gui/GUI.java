@@ -1,7 +1,5 @@
 package com.kosenko.minesweeper.gui;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.kosenko.minesweeper.controllers.GameController;
 import com.kosenko.minesweeper.models.Cell;
@@ -89,6 +87,7 @@ public class GUI {
             newGameDialog.setVisible(true);
 
             JsonObject gameSessionParameters = newGameDialog.getGameParameters();
+            System.out.println(gameSessionParameters);
             if (!gameSessionParameters.has("playerName")
                     || !gameSessionParameters.has("columns")
                     || !gameSessionParameters.has("rows")
@@ -203,7 +202,7 @@ public class GUI {
                         }
 
                         if (GameController.isWon(gameParameters, cells)) {
-                            JOptionPane.showMessageDialog(panel, "You are win!");
+                            JOptionPane.showMessageDialog(panel, "Вы выиграли!");
 
                             try {
                                 gameController.writeHighScore(gameParameters);
