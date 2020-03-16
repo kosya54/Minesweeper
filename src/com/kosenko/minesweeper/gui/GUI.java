@@ -86,19 +86,19 @@ public class GUI {
             NewGameDialog newGameDialog = new NewGameDialog(mainWindow, "New game", true);
             newGameDialog.setVisible(true);
 
-            JsonObject gameSessionParameters = newGameDialog.getGameParameters();
-            System.out.println(gameSessionParameters);
-            if (!gameSessionParameters.has("playerName")
-                    || !gameSessionParameters.has("columns")
-                    || !gameSessionParameters.has("rows")
-                    || !gameSessionParameters.has("mines")) {
+            JsonObject gameParameters = newGameDialog.getGameParameters();
+            System.out.println(gameParameters);
+            if (!gameParameters.has("playerName")
+                    || !gameParameters.has("columns")
+                    || !gameParameters.has("rows")
+                    || !gameParameters.has("mines")) {
                 cardLayout.show(cardContainer, "greetings");
 
                 return;
             }
 
-            JPanel minefield = getMinefield(gameSessionParameters);
-            resizeFrame(gameSessionParameters);
+            JPanel minefield = getMinefield(gameParameters);
+            resizeFrame(gameParameters);
 
             cardContainer.add(minefield, "minefield");
             cardLayout.show(cardContainer, "minefield");
