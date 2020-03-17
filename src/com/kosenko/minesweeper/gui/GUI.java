@@ -120,11 +120,11 @@ public class GUI {
     }
 
     private JMenu getMenu() {
-        JMenu menu = new JMenu("Файл");
+        JMenu menu = new JMenu("File");
 
-        JMenuItem newGameItem = new JMenuItem("Новая игра");
+        JMenuItem newGameItem = new JMenuItem("New Game");
         newGameItem.addActionListener(e -> {
-            NewGameDialog newGameDialog = new NewGameDialog(mainFrame, "Новая игра", true);
+            NewGameDialog newGameDialog = new NewGameDialog(mainFrame, "New Game", true);
             newGameDialog.setVisible(true);
 
             JsonObject gameParameters = newGameDialog.getGameParameters();
@@ -145,16 +145,21 @@ public class GUI {
         });
         menu.add(newGameItem);
 
-        JMenuItem highScoreItem = new JMenuItem("Таблица рекордов");
+        JMenuItem highScoreItem = new JMenuItem("High Scores");
         highScoreItem.addActionListener(e -> {
             mainFrame.setSize(width, height);
             highScore.refreshTable();
             cardLayout.show(panelContainer, "highScorePanel");
         });
         menu.add(highScoreItem);
+
+//TODO: Сделать JPanel About и перевести на англ JDialog
+
+        JMenuItem aboutItem = new JMenuItem("About");
+        menu.add(aboutItem);
         menu.addSeparator();
 
-        JMenuItem exitItem = new JMenuItem("Выход");
+        JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(e -> System.exit(0));
         menu.add(exitItem);
 
