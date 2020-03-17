@@ -15,8 +15,8 @@ public class GameController {
     private final static int DEFAULT_COUNT_MINES = 10;
     private final static int MAX_GRID_LENGTH = 25;
 
-//    private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
-    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
+    private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
+    //    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
     private final static String FILE_NAME = "HighScore";
     private final static String FILE_EXTENSION = ".sav";
 
@@ -82,13 +82,16 @@ public class GameController {
 
     public JsonArray readHighScore() {
         JsonArray highScoreArray = new JsonArray();
-        try (FileReader fileReader = new FileReader(file); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                highScoreArray.add(new JsonParser().parse(line).getAsJsonObject());
+
+        if (file.exists()) {
+            try (FileReader fileReader = new FileReader(file); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    highScoreArray.add(new JsonParser().parse(line).getAsJsonObject());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return highScoreArray;

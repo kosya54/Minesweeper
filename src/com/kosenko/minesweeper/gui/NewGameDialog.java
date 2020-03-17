@@ -38,7 +38,7 @@ class NewGameDialog extends JDialog {
         JLabel minesLabel = new JLabel("Колличество мин на поле:", JLabel.LEFT);
 
         GridVerifier minesVerifier = new GridVerifier(GameController.getDefaultCountMines(),
-                (int) Math.pow(GameController.getDefaultGridLength(), 2));
+                (int) Math.pow(GameController.getDefaultGridLength(), 2) / 3);
         String defaultCountMines = Integer.toString(GameController.getDefaultCountMines());
         mines = getGridField(minesVerifier, defaultCountMines);
 
@@ -100,10 +100,11 @@ class NewGameDialog extends JDialog {
             gameParameters.addProperty("rows", rowsValue);
 
             GridVerifier minesVerifier = (GridVerifier) mines.getInputVerifier();
-            minesVerifier.setMax(columnsValue * rowsValue);
+            int maxMines = (columnsValue * rowsValue) / 3;
+            minesVerifier.setMax(maxMines);
             if (!mines.getInputVerifier().verify(mines)) {
                 String message = String.format("Колличество мин должно быть от %d до %d",
-                        GameController.getDefaultCountMines(), columnsValue * rowsValue);
+                        GameController.getDefaultCountMines(), maxMines);
 
                 JOptionPane.showMessageDialog(mines.getParent(), message);
 

@@ -41,7 +41,7 @@ public class Minefield {
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (minefield[i][j]== MINE) {
+                if (minefield[i][j] == MINE) {
                     continue;
                 }
 
