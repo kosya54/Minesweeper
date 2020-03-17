@@ -14,6 +14,7 @@ import java.util.Arrays;
 public class GUI {
     private JFrame mainWindow;
     private JPanel cardContainer;
+    private HighScore highScore;
     private CardLayout cardLayout;
 
     private GameController gameController;
@@ -29,6 +30,7 @@ public class GUI {
 
     public GUI() {
         gameController = new GameController();
+        highScore = new HighScore(gameController);
 
         iconWidth = Cell.getIconWidth();
         iconHeight = Cell.getIconHeight();
@@ -42,7 +44,7 @@ public class GUI {
         cardContainer.setLayout(cardLayout);
         cardContainer.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
         cardContainer.add(getGreetingsPanel(), "greetings");
-        cardContainer.add(getHighScorePanel(), "highScore");
+        cardContainer.add(highScore.getHighScorePanel(defaultWidth, defaultHeight), "highScore");
 
         mainWindow = new JFrame("Minesweeper");
         setDefaultFrameSize();
@@ -87,7 +89,6 @@ public class GUI {
             newGameDialog.setVisible(true);
 
             JsonObject gameParameters = newGameDialog.getGameParameters();
-            System.out.println(gameParameters);
             if (!gameParameters.has("playerName")
                     || !gameParameters.has("columns")
                     || !gameParameters.has("rows")
@@ -139,13 +140,13 @@ public class GUI {
         return panel;
     }
 
-    private JPanel getHighScorePanel() {
+/*    private JPanel getHighScorePanel() {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder("High score"));
 //        panel.add(highScore);
 
         return panel;
-    }
+    } */
 
     private JPanel getMinefield(JsonObject gameParameters) {
         int columns = gameParameters.get("columns").getAsInt();
