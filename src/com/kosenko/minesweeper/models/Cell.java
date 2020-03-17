@@ -9,8 +9,6 @@ public class Cell extends JButton {
     private final static String ICON_PATH = "src/com/kosenko/minesweeper/resources/";
     private final static String FILE_EXTENSION = ".png";
 
-//    private final static String ICON_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/";
-
     private Icon tile;
     private Icon rollOver;
     private Icon flag;

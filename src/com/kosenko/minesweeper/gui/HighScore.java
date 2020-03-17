@@ -5,8 +5,7 @@ import com.google.gson.JsonObject;
 import com.kosenko.minesweeper.controllers.GameController;
 import com.google.gson.JsonElement;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.util.Vector;

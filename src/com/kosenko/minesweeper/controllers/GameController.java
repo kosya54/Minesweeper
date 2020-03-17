@@ -16,7 +16,6 @@ public class GameController {
     private final static int MAX_GRID_LENGTH = 25;
 
     private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
-    //    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
     private final static String FILE_NAME = "HighScore";
     private final static String FILE_EXTENSION = ".sav";
 

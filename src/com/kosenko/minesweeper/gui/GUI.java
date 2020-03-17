@@ -12,7 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class GUI {
     private JFrame mainFrame;
@@ -87,7 +86,8 @@ public class GUI {
         int columns = gameParameters.get("columns").getAsInt();
         int rows = gameParameters.get("rows").getAsInt();
 
-        mainFrame.setSize(iconWidth * columns + ICON_V_GAP * columns, (iconHeight * rows) + MENU_HEIGHT + ICON_H_GAP * rows);
+        mainFrame.setSize(iconWidth * columns + ICON_V_GAP * columns,
+                (iconHeight * rows) + MENU_HEIGHT + ICON_H_GAP * rows);
     }
 
     private JFrame getMainFrame() {
@@ -152,9 +152,6 @@ public class GUI {
             cardLayout.show(panelContainer, "highScorePanel");
         });
         menu.add(highScoreItem);
-
-        JMenuItem aboutItem = new JMenuItem("Об игре");
-        menu.add(aboutItem);
         menu.addSeparator();
 
         JMenuItem exitItem = new JMenuItem("Выход");
@@ -192,10 +189,6 @@ public class GUI {
         panel.setLayout(new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP));
 
         int[][] minefield = GameController.getMineField(columns, rows, countMines);
-
-
-        temporaryShowMinefieldArray(minefield);
-
 
         Cell[][] cells = new Cell[rows][columns];
         for (int i = 0; i < rows; i++) {
@@ -304,12 +297,5 @@ public class GUI {
         reveal(cells, minefield, x - 1, y + 1, rows, columns);
         reveal(cells, minefield, x, y + 1, rows, columns);
         reveal(cells, minefield, x + 1, y + 1, rows, columns);
-    }
-
-    private void temporaryShowMinefieldArray(int[][] minefield) {
-        System.out.println("New game started!");
-        for (int[] array : minefield) {
-            System.out.println(Arrays.toString(array));
-        }
     }
 }
