@@ -106,6 +106,8 @@ class NewGameDialog extends JDialog {
                         GameController.getDefaultCountMines(), columnsValue * rowsValue);
 
                 JOptionPane.showMessageDialog(mines.getParent(), message);
+
+                return;
             }
 
             int minesValue = Integer.parseInt(mines.getText());
