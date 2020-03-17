@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import java.util.Vector;
 
@@ -16,19 +17,9 @@ public class HighScore {
 
     public HighScore(GameController gameController) {
         this.gameController = gameController;
-
-        Vector<String> titles = new Vector<>();
-        titles.add("Player");
-        titles.add("Columns");
-        titles.add("Rows");
-        titles.add("Mines");
-
-        Vector<Vector<String>> highScoreData = setData();
-
-        table = new JTable(highScoreData, titles);
     }
 
-    private Vector<Vector<String>> setData() {
+    public Vector<Vector<String>> getData() {
         JsonArray jsonArrayHighScore = gameController.readHighScore();
 
         Vector<Vector<String>> highScoreData = new Vector<>();
@@ -47,7 +38,24 @@ public class HighScore {
         return highScoreData;
     }
 
+    private static Vector<String> getTitles() {
+        Vector<String> titles = new Vector<>();
+        titles.add("Player");
+        titles.add("Columns");
+        titles.add("Rows");
+        titles.add("Mines");
+
+        return titles;
+    }
+
+    public void refreshTable() {
+        DefaultTableModel defaultTableModel = (DefaultTableModel) table.getModel();
+        defaultTableModel.setDataVector(getData(), getTitles());
+    }
+
     public JScrollPane getTable() {
+        table = new JTable(getData(), getTitles());
+
         return new JScrollPane(table);
     }
 }

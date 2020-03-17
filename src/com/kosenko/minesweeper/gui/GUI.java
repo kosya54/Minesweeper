@@ -91,7 +91,7 @@ public class GUI {
     }
 
     private JFrame getMainFrame() {
-        JFrame frame = new JFrame("MinesWeeper");
+        JFrame frame = new JFrame("Minesweeper");
         frame.setResizable(false);
         frame.setLayout(new GridBagLayout());
         frame.setSize(width, height);
@@ -148,6 +148,7 @@ public class GUI {
         JMenuItem highScoreItem = new JMenuItem("Таблица рекордов");
         highScoreItem.addActionListener(e -> {
             mainFrame.setSize(width, height);
+            highScore.refreshTable();
             cardLayout.show(panelContainer, "highScorePanel");
         });
         menu.add(highScoreItem);
@@ -250,6 +251,7 @@ public class GUI {
                             }
 
                             mainFrame.setSize(width, height);
+                            highScore.refreshTable();
                             cardLayout.show(panelContainer, "highScorePanel");
                         }
                     }
