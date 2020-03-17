@@ -15,8 +15,8 @@ public class GameController {
     private final static int DEFAULT_COUNT_MINES = 10;
     private final static int MAX_GRID_LENGTH = 25;
 
-    private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
-//    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
+//    private final static String SAVES_PATH = "src/com/kosenko/minesweeper/saves/";
+    private final static String SAVES_PATH = "D:/Java/Minesweeper/src/com/kosenko/minesweeper/saves/";
     private final static String FILE_NAME = "HighScore";
     private final static String FILE_EXTENSION = ".sav";
 
@@ -61,10 +61,10 @@ public class GameController {
         return count;
     }
 
-    public static boolean isWon(JsonObject gameSessionParameters, Cell[][] cells) {
-        int totalCells = gameSessionParameters.get("columns").getAsInt() * gameSessionParameters.get("rows").getAsInt();
+    public static boolean isWon(JsonObject gameParameters, Cell[][] cells) {
+        int totalCells = gameParameters.get("columns").getAsInt() * gameParameters.get("rows").getAsInt();
         int countOpened = GameController.getCountOpenedCells(cells);
-        int mines = gameSessionParameters.get("mines").getAsInt();
+        int mines = gameParameters.get("mines").getAsInt();
 
         return totalCells - countOpened == mines;
     }
