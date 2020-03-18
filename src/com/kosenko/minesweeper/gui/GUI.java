@@ -153,9 +153,11 @@ public class GUI {
         });
         menu.add(highScoreItem);
 
-//TODO: Сделать JPanel About и перевести на англ JDialog
-
         JMenuItem aboutItem = new JMenuItem("About");
+        aboutItem.addActionListener(e -> {
+            String about = String.format("Minesweeper v1.0%n%nАвтор: Косенко А.В.");
+            JOptionPane.showMessageDialog(panelContainer, about);
+        });
         menu.add(aboutItem);
         menu.addSeparator();
 
