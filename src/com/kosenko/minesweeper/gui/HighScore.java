@@ -2,11 +2,12 @@ package com.kosenko.minesweeper.gui;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.kosenko.minesweeper.controllers.GameController;
 import com.google.gson.JsonElement;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import com.kosenko.minesweeper.controllers.GameController;
 
 import java.util.Vector;
 
@@ -19,9 +20,9 @@ public class HighScore {
     }
 
     public Vector<Vector<String>> getData() {
-        JsonArray jsonArrayHighScore = gameController.readHighScore();
-
         Vector<Vector<String>> highScoreData = new Vector<>();
+
+        JsonArray jsonArrayHighScore = gameController.readHighScore();
         for (JsonElement jsonElement : jsonArrayHighScore) {
             JsonObject playerJsonObject = jsonElement.getAsJsonObject();
 
@@ -34,7 +35,6 @@ public class HighScore {
 
             highScoreData.add(playerData);
         }
-
         return highScoreData;
     }
 

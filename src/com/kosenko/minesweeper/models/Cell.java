@@ -6,6 +6,7 @@ public class Cell extends JButton {
     private final static int ICON_WIDTH = 40;
     private final static int ICON_HEIGHT = 40;
     private final static int COUNT_NUMBERS = 10;
+
     private final static String ICON_PATH = "src/com/kosenko/minesweeper/resources/";
     private final static String FILE_EXTENSION = ".png";
 
@@ -24,9 +25,9 @@ public class Cell extends JButton {
 
     public Cell() {
         tile = new ImageIcon(ICON_PATH + "tile" + FILE_EXTENSION);
-        rollOver = new ImageIcon(ICON_PATH + "rollOverTile" + FILE_EXTENSION);
         flag = new ImageIcon(ICON_PATH + "flag" + FILE_EXTENSION);
         mine = new ImageIcon(ICON_PATH + "mine" + FILE_EXTENSION);
+        rollOver = new ImageIcon(ICON_PATH + "rollOverTile" + FILE_EXTENSION);
 
         Icon empty = new ImageIcon(ICON_PATH + "empty" + FILE_EXTENSION);
 

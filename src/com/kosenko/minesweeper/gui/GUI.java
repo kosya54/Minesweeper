@@ -1,13 +1,18 @@
 package com.kosenko.minesweeper.gui;
 
 import com.google.gson.JsonObject;
+
 import com.kosenko.minesweeper.controllers.GameController;
 import com.kosenko.minesweeper.models.Cell;
+
 import javax.imageio.ImageIO;
+
 import javax.swing.*;
 import javax.swing.border.Border;
+
 import java.awt.*;
 import java.awt.event.*;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -144,6 +149,7 @@ public class GUI {
             resizeMainFrameToGrid(gameParameters);
 
             panelContainer.add(minefieldPanel, "minefield");
+
             cardLayout.show(panelContainer, "minefield");
         });
 
@@ -153,7 +159,9 @@ public class GUI {
 
         highScoreItem.addActionListener(e -> {
             mainFrame.setSize(width, height);
+
             highScore.refreshTable();
+
             cardLayout.show(panelContainer, "highScorePanel");
         });
 
@@ -205,6 +213,7 @@ public class GUI {
         int countMines = gameParameters.get("mines").getAsInt();
 
         JPanel panel = new JPanel();
+
         panel.setLayout(new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP));
 
         int[][] minefield = GameController.getMineField(columns, rows, countMines);
@@ -238,6 +247,7 @@ public class GUI {
                                 JOptionPane.showMessageDialog(panel, "Game over!");
 
                                 mainFrame.setSize(width, height);
+
                                 cardLayout.show(panelContainer, "highScorePanel");
                             }
 
@@ -261,11 +271,14 @@ public class GUI {
                                 gameController.writeHighScore(gameParameters);
                             } catch (IOException ex) {
                                 JOptionPane.showMessageDialog(panel, ex.getMessage());
+
                                 ex.printStackTrace();
                             }
 
                             mainFrame.setSize(width, height);
+
                             highScore.refreshTable();
+
                             cardLayout.show(panelContainer, "highScorePanel");
                         }
                     }
@@ -276,7 +289,6 @@ public class GUI {
                 panel.add(cell);
             }
         }
-
         return panel;
     }
 

@@ -2,13 +2,14 @@ package com.kosenko.minesweeper.controllers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
+
 import com.kosenko.minesweeper.models.Minefield;
 import com.kosenko.minesweeper.models.Cell;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
-import com.google.gson.JsonObject;
+import java.nio.charset.StandardCharsets;
 
 public class GameController {
     private final static int DEFAULT_GRID_LENGTH = 9;
@@ -56,7 +57,6 @@ public class GameController {
                 }
             }
         }
-
         return count;
     }
 

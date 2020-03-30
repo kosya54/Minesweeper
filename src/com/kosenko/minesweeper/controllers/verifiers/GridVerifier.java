@@ -2,6 +2,7 @@ package com.kosenko.minesweeper.controllers.verifiers;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+
 import java.awt.*;
 
 public class GridVerifier extends InputVerifier {
@@ -54,7 +55,6 @@ public class GridVerifier extends InputVerifier {
                 return false;
             }
         }
-
         return true;
     }
 }

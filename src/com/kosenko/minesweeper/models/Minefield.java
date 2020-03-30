@@ -21,6 +21,7 @@ public class Minefield {
 
     private int[][] generateMinesInField() {
         Random random = new Random();
+
         int[][] minefield = new int[rows][columns];
 
         int count = 0;
@@ -30,6 +31,7 @@ public class Minefield {
 
             if (minefield[i][j] != MINE) {
                 minefield[i][j] = MINE;
+
                 ++count;
             }
         }
@@ -121,7 +123,6 @@ public class Minefield {
                 }
             }
         }
-
         return minefield;
     }
 }

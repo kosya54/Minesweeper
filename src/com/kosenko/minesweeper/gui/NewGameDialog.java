@@ -7,6 +7,7 @@ import com.kosenko.minesweeper.controllers.verifiers.GridVerifier;
 import com.kosenko.minesweeper.controllers.verifiers.PlayerNameVerifier;
 
 import javax.swing.*;
+
 import java.awt.*;
 
 class NewGameDialog extends JDialog {
@@ -26,28 +27,22 @@ class NewGameDialog extends JDialog {
         gameParameters = new JsonObject();
 
         JLabel playerNameLabel = new JLabel("Введите ваше имя:", JLabel.LEFT);
-
-        playerName = getPlayerNameField();
+        JLabel columnsLabel = new JLabel("Ширина поля:", JLabel.LEFT);
+        JLabel rowsLabel = new JLabel("Высота поля:", JLabel.LEFT);
+        JLabel minesLabel = new JLabel("Колличество мин на поле:", JLabel.LEFT);
 
         GridVerifier gridVerifier = new GridVerifier(GameController.getDefaultGridLength(),
                 GameController.getMaxGridLength());
-
-        String defaultGridLength = Integer.toString(GameController.getDefaultGridLength());
-
-        JLabel columnsLabel = new JLabel("Ширина поля:", JLabel.LEFT);
-
-        columns = getGridField(gridVerifier, defaultGridLength);
-
-        JLabel rowsLabel = new JLabel("Высота поля:", JLabel.LEFT);
-
-        rows = getGridField(gridVerifier, defaultGridLength);
-
         GridVerifier minesVerifier = new GridVerifier(GameController.getDefaultCountMines(),
                 (int) Math.pow(GameController.getDefaultGridLength(), 2) / 3);
+
+        String defaultGridLength = Integer.toString(GameController.getDefaultGridLength());
         String defaultCountMines = Integer.toString(GameController.getDefaultCountMines());
 
-        JLabel minesLabel = new JLabel("Колличество мин на поле:", JLabel.LEFT);
+        playerName = getPlayerNameField();
+        columns = getGridField(gridVerifier, defaultGridLength);
         mines = getGridField(minesVerifier, defaultCountMines);
+        rows = getGridField(gridVerifier, defaultGridLength);
 
         JButton ok = getButtonOk();
         JButton cancel = getButtonCancel();
