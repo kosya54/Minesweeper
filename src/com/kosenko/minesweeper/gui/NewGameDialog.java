@@ -7,8 +7,10 @@ import com.kosenko.minesweeper.controllers.verifiers.PlayerNameVerifier;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 
-class NewGameDialog extends JDialog {
+class NewGameDialog extends JDialog implements KeyListener {
     private JTextField playerName;
     private JTextField columns;
     private JTextField rows;
@@ -18,6 +20,8 @@ class NewGameDialog extends JDialog {
 
     public NewGameDialog(JFrame parent, String name, boolean modal) {
         super(parent, name, modal);
+
+        addKeyListener(this);
 
         setLayout(new GridBagLayout());
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -76,43 +80,7 @@ class NewGameDialog extends JDialog {
         JButton ok = new JButton("Ok");
         ok.setVerifyInputWhenFocusTarget(true);
         ok.addActionListener(e -> {
-            if (!playerName.getInputVerifier().verify(playerName)) {
-                JOptionPane.showMessageDialog(playerName.getParent(), "Имя должно быть от 3 до 10 символов");
-
-                return;
-            }
-
-            gameParameters.addProperty("playerName", playerName.getText());
-
-            if (!columns.getInputVerifier().verify(columns) || !rows.getInputVerifier().verify(rows)) {
-                String message = String.format("Длина поля должна быть от %d до %d",
-                        GameController.getDefaultGridLength(), GameController.getMaxGridLength());
-
-                JOptionPane.showMessageDialog(columns.getParent(), message);
-
-                return;
-            }
-
-            int columnsValue = Integer.parseInt(columns.getText());
-            gameParameters.addProperty("columns", columnsValue);
-
-            int rowsValue = Integer.parseInt(rows.getText());
-            gameParameters.addProperty("rows", rowsValue);
-
-            GridVerifier minesVerifier = (GridVerifier) mines.getInputVerifier();
-            int maxMines = (columnsValue * rowsValue) / 3;
-            minesVerifier.setMax(maxMines);
-            if (!mines.getInputVerifier().verify(mines)) {
-                String message = String.format("Колличество мин должно быть от %d до %d",
-                        GameController.getDefaultCountMines(), maxMines);
-
-                JOptionPane.showMessageDialog(mines.getParent(), message);
-
-                return;
-            }
-
-            int minesValue = Integer.parseInt(mines.getText());
-            gameParameters.addProperty("mines", minesValue);
+            setGameParameters();
 
             dispose();
         });
@@ -143,6 +111,73 @@ class NewGameDialog extends JDialog {
         grid.setHorizontalAlignment(JTextField.CENTER);
 
         return grid;
+    }
+
+    private void setGameParameters() {
+        if (!playerName.getInputVerifier().verify(playerName)) {
+            JOptionPane.showMessageDialog(playerName.getParent(), "Имя должно быть от 3 до 10 символов");
+
+            return;
+        }
+
+        gameParameters.addProperty("playerName", playerName.getText());
+
+        if (!columns.getInputVerifier().verify(columns) || !rows.getInputVerifier().verify(rows)) {
+            String message = String.format("Длина поля должна быть от %d до %d",
+                    GameController.getDefaultGridLength(), GameController.getMaxGridLength());
+
+            JOptionPane.showMessageDialog(columns.getParent(), message);
+
+            return;
+        }
+
+        int columnsValue = Integer.parseInt(columns.getText());
+        gameParameters.addProperty("columns", columnsValue);
+
+        int rowsValue = Integer.parseInt(rows.getText());
+        gameParameters.addProperty("rows", rowsValue);
+
+        GridVerifier minesVerifier = (GridVerifier) mines.getInputVerifier();
+        int maxMines = (columnsValue * rowsValue) / 3;
+        minesVerifier.setMax(maxMines);
+        if (!mines.getInputVerifier().verify(mines)) {
+            String message = String.format("Колличество мин должно быть от %d до %d",
+                    GameController.getDefaultCountMines(), maxMines);
+
+            JOptionPane.showMessageDialog(mines.getParent(), message);
+
+            return;
+        }
+
+        int minesValue = Integer.parseInt(mines.getText());
+        gameParameters.addProperty("mines", minesValue);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        System.out.println(e.getKeyCode());
+
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            setGameParameters();
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        System.out.println(e.getKeyCode());
+
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            setGameParameters();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println(e.getKeyCode());
+
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            setGameParameters();
+        }
     }
 
     private GridBagConstraints getConstraints() {
