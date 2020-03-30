@@ -175,7 +175,8 @@ public class GUI {
                 super.paint(graphics);
 
                 try {
-                    Image image = ImageIO.read(new File("src/com/kosenko/minesweeper/resources/logo.png"));
+//                    Image image = ImageIO.read(new File("src/com/kosenko/minesweeper/resources/logo.png"));
+                    Image image = ImageIO.read(new File("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/logo.png"));
 
                     int x = (this.getWidth() - image.getWidth(null)) / 2;
                     int y = (this.getHeight() - image.getHeight(null)) / 2;
@@ -207,8 +208,8 @@ public class GUI {
 
                 cell.addMouseListener(new MouseAdapter() {
                     @Override
-                    public void mouseClicked(MouseEvent e) {
-                        super.mouseClicked(e);
+                    public void mouseReleased(MouseEvent e) {
+                        super.mouseReleased(e);
 
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             if (cell.isFlagged()) {
