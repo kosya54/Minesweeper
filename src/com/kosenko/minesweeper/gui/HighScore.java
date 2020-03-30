@@ -26,6 +26,7 @@ public class HighScore {
             JsonObject playerJsonObject = jsonElement.getAsJsonObject();
 
             Vector<String> playerData = new Vector<>();
+
             playerData.add(playerJsonObject.get("playerName").getAsString());
             playerData.add(playerJsonObject.get("columns").getAsString());
             playerData.add(playerJsonObject.get("rows").getAsString());
@@ -39,6 +40,7 @@ public class HighScore {
 
     private static Vector<String> getTitles() {
         Vector<String> titles = new Vector<>();
+
         titles.add("Player");
         titles.add("Columns");
         titles.add("Rows");

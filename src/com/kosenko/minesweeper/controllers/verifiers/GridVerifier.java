@@ -23,6 +23,7 @@ public class GridVerifier extends InputVerifier {
     @Override
     public boolean verify(JComponent input) {
         JTextField grid = (JTextField) input;
+
         if (grid.getText().trim().equals("")) {
             grid.setBorder(BORDER_RED);
 

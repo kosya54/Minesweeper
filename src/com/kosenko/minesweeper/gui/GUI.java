@@ -3,13 +3,11 @@ package com.kosenko.minesweeper.gui;
 import com.google.gson.JsonObject;
 import com.kosenko.minesweeper.controllers.GameController;
 import com.kosenko.minesweeper.models.Cell;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,7 +15,6 @@ public class GUI {
     private JFrame mainFrame;
     private JPanel panelContainer;
     private CardLayout cardLayout;
-
     private HighScore highScore;
     private GameController gameController;
 
@@ -36,6 +33,7 @@ public class GUI {
         GridBagConstraints gridBagConstraints = getGridBagConstraints();
 
         gameController = new GameController();
+
         highScore = new HighScore(gameController);
 
         iconWidth = Cell.getIconWidth();
@@ -92,6 +90,7 @@ public class GUI {
 
     private JFrame getMainFrame() {
         JFrame frame = new JFrame("Minesweeper");
+
         frame.setResizable(false);
         frame.setLayout(new GridBagLayout());
         frame.setSize(width, height);
@@ -104,6 +103,7 @@ public class GUI {
         cardLayout = new CardLayout();
 
         JPanel panel = new JPanel(cardLayout);
+
         panel.setBorder(PANELS_BORDER);
         panel.add(getGreetingsPanel(), "greetingsPanel");
         panel.add(highScore.getTable(), "highScorePanel");
@@ -113,6 +113,7 @@ public class GUI {
 
     private JMenuBar getMenuBar() {
         JMenuBar menuBar = new JMenuBar();
+
         menuBar.add(getMenu());
         menuBar.setPreferredSize(new Dimension(width, MENU_HEIGHT));
 
@@ -123,6 +124,7 @@ public class GUI {
         JMenu menu = new JMenu("File");
 
         JMenuItem newGameItem = new JMenuItem("New Game");
+
         newGameItem.addActionListener(e -> {
             NewGameDialog newGameDialog = new NewGameDialog(mainFrame, "New Game", true);
             newGameDialog.setVisible(true);
@@ -138,31 +140,39 @@ public class GUI {
             }
 
             JPanel minefieldPanel = getMinefieldPanel(gameParameters);
+
             resizeMainFrameToGrid(gameParameters);
 
             panelContainer.add(minefieldPanel, "minefield");
             cardLayout.show(panelContainer, "minefield");
         });
+
         menu.add(newGameItem);
 
         JMenuItem highScoreItem = new JMenuItem("High Scores");
+
         highScoreItem.addActionListener(e -> {
             mainFrame.setSize(width, height);
             highScore.refreshTable();
             cardLayout.show(panelContainer, "highScorePanel");
         });
+
         menu.add(highScoreItem);
 
         JMenuItem aboutItem = new JMenuItem("About");
+
         aboutItem.addActionListener(e -> {
             String about = String.format("Minesweeper v1.0%n%nАвтор: Косенко А.В.");
             JOptionPane.showMessageDialog(panelContainer, about);
         });
+
         menu.add(aboutItem);
         menu.addSeparator();
 
         JMenuItem exitItem = new JMenuItem("Exit");
+
         exitItem.addActionListener(e -> System.exit(0));
+
         menu.add(exitItem);
 
         return menu;
@@ -175,11 +185,12 @@ public class GUI {
                 super.paint(graphics);
 
                 try {
-//                    Image image = ImageIO.read(new File("src/com/kosenko/minesweeper/resources/logo.png"));
-                    Image image = ImageIO.read(new File("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/logo.png"));
+                    Image image = ImageIO.read(new File("src/com/kosenko/minesweeper/resources/logo.png"));
+//                    Image image = ImageIO.read(new File("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/logo.png"));
 
                     int x = (this.getWidth() - image.getWidth(null)) / 2;
                     int y = (this.getHeight() - image.getHeight(null)) / 2;
+
                     graphics.drawImage(image, x, y, this);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -199,9 +210,11 @@ public class GUI {
         int[][] minefield = GameController.getMineField(columns, rows, countMines);
 
         Cell[][] cells = new Cell[rows][columns];
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 Cell cell = new Cell();
+
                 cell.setTile();
                 cell.setPositionX(j);
                 cell.setPositionY(i);
@@ -259,6 +272,7 @@ public class GUI {
                 });
 
                 cells[i][j] = cell;
+
                 panel.add(cell);
             }
         }
