@@ -9,6 +9,7 @@ import com.kosenko.minesweeper.controllers.verifiers.PlayerNameVerifier;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 class NewGameDialog extends JDialog {
     private JTextField playerName;
@@ -46,8 +47,11 @@ class NewGameDialog extends JDialog {
 
         JButton ok = getButtonOk();
         JButton cancel = getButtonCancel();
+        
+        KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 
         JRootPane rootPane = SwingUtilities.getRootPane(this);
+        rootPane.registerKeyboardAction(e -> dispose(), escapeKey, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         rootPane.setDefaultButton(ok);
 
         GridBagConstraints constraints = getConstraints();
