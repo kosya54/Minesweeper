@@ -8,11 +8,15 @@ public class Minefield {
     private int columns;
     private int rows;
     private int countMines;
+    private int firstClickX;
+    private int firstClickY;
 
-    public Minefield(int columns, int rows, int countMines) {
+    public Minefield(int columns, int rows, int countMines, int firstClickX, int firstClickY) {
         this.columns = columns;
         this.rows = rows;
         this.countMines = countMines;
+        this.firstClickX = firstClickX; 
+        this.firstClickY = firstClickY;
     }
 
     public static int getMine() {
@@ -28,6 +32,10 @@ public class Minefield {
         while (count != countMines) {
             int i = random.nextInt(rows - 1);
             int j = random.nextInt(columns - 1);
+
+            if (i == firstClickX && j == firstClickY) {
+                continue;
+            }
 
             if (minefield[i][j] != MINE) {
                 minefield[i][j] = MINE;
