@@ -15,6 +15,7 @@ import java.awt.event.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class GUI {
     private JFrame mainFrame;
@@ -211,13 +212,11 @@ public class GUI {
         int columns = gameParameters.get("columns").getAsInt();
         int rows = gameParameters.get("rows").getAsInt();
         int countMines = gameParameters.get("mines").getAsInt();
-
+        
         JPanel panel = new JPanel();
-
         panel.setLayout(new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP));
 
-        int[][] minefield = GameController.getMineField(columns, rows, countMines);
-
+//        int[][] minefield = new int[columns][rows];
         Cell[][] cells = new Cell[rows][columns];
 
         for (int i = 0; i < rows; i++) {
@@ -229,18 +228,25 @@ public class GUI {
                 cell.setPositionY(i);
 
                 cell.addMouseListener(new MouseAdapter() {
+                    private boolean isFirstClick = true;
+
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         super.mouseReleased(e);
 
                         if (e.getButton() == MouseEvent.BUTTON1) {
-                            if (cell.isFlagged()) {
-                                cell.setFlagged(false);
-                            }
-
                             int x = cell.getPositionX();
                             int y = cell.getPositionY();
 
+                            int[][] minefield = new int[columns][rows];
+
+                            if (isFirstClick) {
+                                minefield = GameController.getMineField(columns, rows, countMines, 0, 0);
+                                temporaryPrintMinefield(minefield);
+
+                                isFirstClick = false;
+                            }
+                            
                             if (GameController.isLose(minefield[y][x])) {
                                 cell.setMine();
 
@@ -331,5 +337,13 @@ public class GUI {
         reveal(cells, minefield, x - 1, y + 1, rows, columns);
         reveal(cells, minefield, x, y + 1, rows, columns);
         reveal(cells, minefield, x + 1, y + 1, rows, columns);
+    }
+
+    private void temporaryPrintMinefield(int[][] minefield) {
+        System.out.println("New Game started:");
+        for (int[] rowArray : minefield) {
+            System.out.println(Arrays.toString(rowArray));
+        }
+        System.out.println();
     }
 }
