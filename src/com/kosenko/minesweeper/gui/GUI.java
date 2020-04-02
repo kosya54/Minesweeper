@@ -15,7 +15,6 @@ import java.awt.event.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class GUI {
     private JFrame mainFrame;
@@ -146,11 +145,11 @@ public class GUI {
             }
 
             JPanel minefieldPanel = getMinefieldPanel(gameParameters);
-
             resizeMainFrameToGrid(gameParameters);
 
-            panelContainer.add(minefieldPanel, "minefield");
+            gameController.setFirstClick(true);
 
+            panelContainer.add(minefieldPanel, "minefield");
             cardLayout.show(panelContainer, "minefield");
         });
 
@@ -211,12 +210,10 @@ public class GUI {
     private JPanel getMinefieldPanel(JsonObject gameParameters) {
         int columns = gameParameters.get("columns").getAsInt();
         int rows = gameParameters.get("rows").getAsInt();
-        int countMines = gameParameters.get("mines").getAsInt();
         
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(rows, columns, ICON_V_GAP, ICON_H_GAP));
 
-//        int[][] minefield = new int[columns][rows];
         Cell[][] cells = new Cell[rows][columns];
 
         for (int i = 0; i < rows; i++) {
@@ -228,36 +225,37 @@ public class GUI {
                 cell.setPositionY(i);
 
                 cell.addMouseListener(new MouseAdapter() {
-                    private boolean isFirstClick = true;
-
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         super.mouseReleased(e);
 
                         if (e.getButton() == MouseEvent.BUTTON1) {
+                            if (cell.isFlagged()) {
+                                return;
+                            }
+
                             int x = cell.getPositionX();
                             int y = cell.getPositionY();
 
-                            int[][] minefield = new int[columns][rows];
-
-                            if (isFirstClick) {
-                                minefield = GameController.getMineField(columns, rows, countMines, 0, 0);
-                                temporaryPrintMinefield(minefield);
-
-                                isFirstClick = false;
+                            if (gameController.isFirstClick()) {
+                                gameController.startGame(gameParameters, x, y);
+                                gameController.setFirstClick(false);
                             }
-                            
-                            if (GameController.isLose(minefield[y][x])) {
-                                cell.setMine();
 
+                            if (gameController.gameOver(x, y, cells) == -1) {
                                 JOptionPane.showMessageDialog(panel, "Game over!");
-
+                                
                                 mainFrame.setSize(width, height);
-
                                 cardLayout.show(panelContainer, "highScorePanel");
                             }
 
-                            reveal(cells, minefield, x, y, rows, columns);
+                            if (gameController.gameOver(x, y, cells) == 1) {
+                                JOptionPane.showMessageDialog(panel, "You win!");
+                                
+                                mainFrame.setSize(width, height);
+                                highScore.refreshTable();
+                                cardLayout.show(panelContainer, "highScorePanel");
+                            }
                         }
 
                         if (e.getButton() == MouseEvent.BUTTON2 || e.getButton() == MouseEvent.BUTTON3) {
@@ -269,24 +267,6 @@ public class GUI {
                                 cell.setTile();
                             }
                         }
-
-                        if (GameController.isWon(gameParameters, cells)) {
-                            JOptionPane.showMessageDialog(panel, "Вы выиграли!");
-
-                            try {
-                                gameController.writeHighScore(gameParameters);
-                            } catch (IOException ex) {
-                                JOptionPane.showMessageDialog(panel, ex.getMessage());
-
-                                ex.printStackTrace();
-                            }
-
-                            mainFrame.setSize(width, height);
-
-                            highScore.refreshTable();
-
-                            cardLayout.show(panelContainer, "highScorePanel");
-                        }
                     }
                 });
 
@@ -296,54 +276,5 @@ public class GUI {
             }
         }
         return panel;
-    }
-
-    private boolean outOfRange(int x, int y, int rows, int columns) {
-        return x < 0 || y < 0 || x >= columns || y >= rows;
-    }
-
-    private void reveal(Cell[][] cells, int[][] minefield, int x, int y, int rows, int columns) {
-        if (outOfRange(x, y, rows, columns)) {
-            return;
-        }
-
-        if (minefield[y][x] == GameController.getMineValue()) {
-            return;
-        }
-
-        if (cells[y][x].isOpened()) {
-            return;
-        }
-
-        if (cells[y][x].isFlagged()) {
-            return;
-        }
-
-        if (minefield[y][x] > 0) {
-            cells[y][x].setNumber(minefield[y][x]);
-            cells[y][x].setOpened();
-
-            return;
-        }
-
-        cells[y][x].setOpened();
-        cells[y][x].setNumber(minefield[y][x]);
-
-        reveal(cells, minefield, x - 1, y - 1, rows, columns);
-        reveal(cells, minefield, x, y - 1, rows, columns);
-        reveal(cells, minefield, x + 1, y - 1, rows, columns);
-        reveal(cells, minefield, x - 1, y, rows, columns);
-        reveal(cells, minefield, x + 1, y, rows, columns);
-        reveal(cells, minefield, x - 1, y + 1, rows, columns);
-        reveal(cells, minefield, x, y + 1, rows, columns);
-        reveal(cells, minefield, x + 1, y + 1, rows, columns);
-    }
-
-    private void temporaryPrintMinefield(int[][] minefield) {
-        System.out.println("New Game started:");
-        for (int[] rowArray : minefield) {
-            System.out.println(Arrays.toString(rowArray));
-        }
-        System.out.println();
     }
 }
