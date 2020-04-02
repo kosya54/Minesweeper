@@ -129,7 +129,7 @@ public class GUI {
         JMenu menu = new JMenu("File");
 
         JMenuItem newGameItem = new JMenuItem("New Game");
-        newGameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        newGameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         newGameItem.addActionListener(e -> {
             NewGameDialog newGameDialog = new NewGameDialog(mainFrame, "New Game", true);
             newGameDialog.setVisible(true);
@@ -156,7 +156,7 @@ public class GUI {
         menu.add(newGameItem);
 
         JMenuItem highScoreItem = new JMenuItem("High Scores");
-        highScoreItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+        highScoreItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         highScoreItem.addActionListener(e -> {
             mainFrame.setSize(width, height);
 
@@ -168,7 +168,7 @@ public class GUI {
         menu.add(highScoreItem);
 
         JMenuItem aboutItem = new JMenuItem("About");
-        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
         aboutItem.addActionListener(e -> {
             String about = String.format("Minesweeper v1.0%n%nАвтор: Косенко А.В.");
             JOptionPane.showMessageDialog(panelContainer, about);
@@ -178,7 +178,7 @@ public class GUI {
         menu.addSeparator();
 
         JMenuItem exitItem = new JMenuItem("Exit");
-        exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+        exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
         exitItem.addActionListener(e -> System.exit(0));
 
         menu.add(exitItem);
@@ -193,8 +193,8 @@ public class GUI {
                 super.paint(graphics);
 
                 try {
-//                    Image image = ImageIO.read(new File("src/com/kosenko/minesweeper/resources/logo.png"));
-                    Image image = ImageIO.read(new File("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/logo.png"));
+                    Image image = ImageIO.read(new File("src/com/kosenko/minesweeper/resources/logo.png"));
+//                    Image image = ImageIO.read(new File("D:/Java/Minesweeper/src/com/kosenko/minesweeper/resources/logo.png"));
 
                     int x = (this.getWidth() - image.getWidth(null)) / 2;
                     int y = (this.getHeight() - image.getHeight(null)) / 2;
