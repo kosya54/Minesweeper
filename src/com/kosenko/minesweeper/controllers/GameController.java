@@ -10,8 +10,19 @@ import com.kosenko.minesweeper.models.Cell;
 import java.io.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class GameController {
+    private int[][] minefield;
+
+    private JsonObject gameParameters;
+    private boolean isFirstClick;
+    private File file;
+    
+    private int columns;
+    private int rows;
+    private int countMines;
+
     private final static int DEFAULT_GRID_LENGTH = 9;
     private final static int DEFAULT_COUNT_MINES = 10;
     private final static int MAX_GRID_LENGTH = 25;
@@ -21,10 +32,16 @@ public class GameController {
     private final static String FILE_NAME = "HighScore";
     private final static String FILE_EXTENSION = ".sav";
 
-    private File file;
-
     public GameController() {
         file = new File(SAVES_PATH, FILE_NAME + FILE_EXTENSION);
+    }
+
+    public boolean isFirstClick() {
+        return isFirstClick;
+    }
+
+    public void setFirstClick(boolean isFirstClick) {
+        this.isFirstClick = isFirstClick;
     }
 
     public static int getDefaultGridLength() {
@@ -43,13 +60,83 @@ public class GameController {
         return Minefield.getMine();
     }
 
-    public static int[][] getMineField(int columns, int rows, int countMines, int firstClickX, int firstClickY) {
-        Minefield minefield = new Minefield(columns, rows, countMines, firstClickX, firstClickY);
+    public void startGame(JsonObject gameParameters, int firstClickX, int firstClickY) {
+        this.gameParameters = gameParameters;
 
-        return minefield.generateMinefield();
+        columns = gameParameters.get("columns").getAsInt();
+        rows = gameParameters.get("rows").getAsInt();
+        countMines = gameParameters.get("mines").getAsInt();
+
+        Minefield minefield = new Minefield(columns, rows, countMines, firstClickX, firstClickY);
+        this.minefield = minefield.generateMinefield();
+
+        temporaryPrintMinefield();
     }
 
-    private static int getCountOpenedCells(Cell[][] cells) {
+    //-1 игра проиграна, 1 игра выиграна
+    public int gameOver(int x, int y, Cell[][] cells) {
+        if (isLose(minefield[y][x])) {
+            cells[y][x].setMine();
+
+            return -1;
+        }
+
+        if (isWon(cells)) {
+            try {
+                writeHighScore(gameParameters);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            return 1;
+        }
+
+        reveal(cells, x, y);
+
+        return 0;
+    }
+
+    private boolean outOfRange(int x, int y) {
+        return x < 0 || y < 0 || x >= columns || y >= rows;
+    }
+
+    private void reveal(Cell[][] cells, int x, int y) {
+        if (outOfRange(x, y)) {
+            return;
+        }
+
+        if (minefield[y][x] == GameController.getMineValue()) {
+            return;
+        }
+
+        if (cells[y][x].isOpened()) {
+            return;
+        }
+
+        if (cells[y][x].isFlagged()) {
+            return;
+        }
+
+        if (minefield[y][x] > 0) {
+            cells[y][x].setNumber(minefield[y][x]);
+            cells[y][x].setOpened();
+
+            return;
+        }
+
+        cells[y][x].setOpened();
+        cells[y][x].setNumber(minefield[y][x]);
+
+        reveal(cells, x - 1, y - 1);
+        reveal(cells, x, y - 1);
+        reveal(cells, x + 1, y - 1);
+        reveal(cells, x - 1, y);
+        reveal(cells, x + 1, y);
+        reveal(cells, x - 1, y + 1);
+        reveal(cells, x, y + 1);
+        reveal(cells, x + 1, y + 1);
+    }
+
+    private static int getOpenedCellsCount(Cell[][] cells) {
         int count = 0;
         for (Cell[] innerArray : cells) {
             for (Cell cell : innerArray) {
@@ -61,21 +148,20 @@ public class GameController {
         return count;
     }
 
-    public static boolean isWon(JsonObject gameParameters, Cell[][] cells) {
-        int totalCells = gameParameters.get("columns").getAsInt() * gameParameters.get("rows").getAsInt();
-        int countOpened = GameController.getCountOpenedCells(cells);
-        int mines = gameParameters.get("mines").getAsInt();
+    private boolean isWon(Cell[][] cells) {
+        int totalCells = columns * rows;
+        int countOpened = GameController.getOpenedCellsCount(cells);
 
-        return totalCells - countOpened == mines;
+        return totalCells - countOpened == countMines;
     }
 
-    public static boolean isLose(int value) {
+    private static boolean isLose(int value) {
         return value == getMineValue();
     }
 
-    public void writeHighScore(JsonObject gameSession) throws IOException {
+    private void writeHighScore(JsonObject gameParameters) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8))) {
-            writer.write(gameSession.toString());
+            writer.write(gameParameters.toString());
             writer.append(System.lineSeparator());
         }
     }
@@ -95,5 +181,13 @@ public class GameController {
         }
 
         return highScoreArray;
+    }
+
+    private void temporaryPrintMinefield() {
+        System.out.println("New Game started:");
+        for (int[] rowArray : minefield) {
+            System.out.println(Arrays.toString(rowArray));
+        }
+        System.out.println();
     }
 }
